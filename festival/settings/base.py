@@ -71,6 +71,9 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
 
     "accounts",
+    "booths",
+    "manages",
+    "notices"
     
 
 ]
@@ -84,7 +87,7 @@ REST_FRAMEWORK = {
 }
 REST_USE_JWT = True
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=72),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -203,6 +206,12 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_S3_SECURE_URLS = False       
 AWS_QUERYSTRING_AUTH = False    
 
-# AWS_ACCESS_KEY_ID = env('AWS_S3_ACCESS_KEY_ID')
-# AWS_SECRET_ACCESS_KEY = env('AWS_S3_SECRET_ACCESS_KEY')
-# AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = env('AWS_S3_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_S3_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+
+# Kakao
+KAKAO_CLIENT_ID =  env('KAKAO_CLIENT_ID')
+KAKAO_APP_ID =  env('KAKAO_APP_ID')
+KAKAO_CLIENT_SECRET_KEY =  env('KAKAO_CLIENT_SECRET_KEY')
+KAKAO_REDIRECT_URI =  env('KAKAO_REDIRECT_URI')

@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
                         default=django.utils.timezone.now, verbose_name="date joined"
                     ),
                 ),
-                ("nickname", models.CharField(max_length=10)),
+                ("nickname", models.CharField(max_length=8)),
                 ("is_booth", models.BooleanField(default=False)),
                 ("is_tf", models.BooleanField(default=False)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
