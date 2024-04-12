@@ -83,8 +83,10 @@ class LikeMenuSerializer(serializers.ModelSerializer):
     is_liked = serializers.BooleanField(default=False)
     booth_id = serializers.SerializerMethodField()
     info = serializers.SerializerMethodField()
+    thumnail = serializers.SerializerMethodField()
+    opened = serializers.SerializerMethodField()
     class Meta:
-        model=Booth
+        model=Menu
         fields=['id', 'name',"booth_id", 'info','thumnail','opened','is_liked']
     
     def get_name(self,obj):
@@ -93,3 +95,7 @@ class LikeMenuSerializer(serializers.ModelSerializer):
         return obj.booth.id
     def get_info(self, obj):
         return str(obj.price)+"원"
+    def get_thumnail(self, obj):
+        return obj.img
+    def get_opened(self, obj):
+        return not obj.is_soldout
