@@ -157,3 +157,46 @@ class BoothListView(views.APIView):
 
         return Response({'message': "부스 목록 조회 성공","page":page, 'total': total, 
                         'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
+    
+
+class HomeView(views.APIView):
+    def get(self,request):
+        user = request.user
+        nickname = request.user.nickname
+        type = request.GET.get('type')
+        
+        if(type=="부스"):
+            booths = Booth.objects.filter(like=user.id,performance=False)[:4]
+            for booth in booths:
+                booth.is_liked=True
+            total = len(booths)
+            if (total==0):
+                return Response({'message': "스크랩한 부스가 없습니다", 'data': None}, status=HTTP_200_OK)
+            serializers = BoothListSerializer(booths,many=True)
+            return Response({'message': "스크랩한 부스 목록 조회 성공",'data': serializers.data}, status=HTTP_200_OK)
+        
+        elif(type=="메뉴"):
+            menus = Menu.objects.filter(like=user.id)
+            for menu in menus:
+                menu.is_liked=True
+            total = len(menus)
+            if (total==0):
+                return Response({'message': "스크랩한 메뉴가 없습니다",'data': None}, status=HTTP_200_OK)
+            menus = self.paginate_queryset(menus)
+            serializers = MenuSerializer(menus,many=True)
+            return Response({'message': "스크랩한 메뉴 목록 조회 성공",'data': serializers.data}, status=HTTP_200_OK)
+
+        elif(type=="공연"):
+            booths = Booth.objects.filter(like=user.id,performance=True)
+            for booth in booths:
+                booth.is_liked=True
+            total = len(booths)
+            if (total==0):
+                return Response({'message': "스크랩한 공연이 없습니다",'data': None}, status=HTTP_200_OK)
+            booths = self.paginate_queryset(booths)
+            serializers = BoothListSerializer(booths,many=True)
+            return Response({'message': "스크랩한 공연 목록 조회 성공",'data': serializers.data}, status=HTTP_200_OK)
+        else:
+            return Response({'message': "type을 입력해주세요"}, status=HTTP_400_BAD_REQUEST)
+      
+       
