@@ -19,9 +19,7 @@ class BoothListSerializer(serializers.ModelSerializer):
         model = Booth
 
         fields = ['id', 'user', 'day', 'college', 'category', 'name', 
-                  'number', 'thumnail', 'opened', 'times',
-                  'description','menus', 'is_liked', 'created_at', 'updated_at',
-                    'comments', 'contact', 'realtime', 'performance']
+                  'number', 'thumnail', 'opened', 'times','is_liked', 'performance']
         read_only_fields= ('thumnail', )
 
 
@@ -34,6 +32,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    mine=serializers.BooleanField(default=False)
+    manager=serializers.BooleanField(default=False)
 
     class Meta:
         model = Comment
@@ -47,6 +47,7 @@ class BoothDetailSerializer(serializers.ModelSerializer):
     menus = MenuSerializer(read_only=True, many=True)
     is_liked = serializers.BooleanField(default=False)
     comments = CommentSerializer(many=True, read_only=True)
+    like_num=serializers.IntegerField()
 
     class Meta:
         model = Booth

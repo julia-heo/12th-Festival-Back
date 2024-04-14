@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+import math
 from rest_framework import views
 from rest_framework.status import *
 from rest_framework.response import Response
@@ -72,3 +74,86 @@ class ChangeLikeView(views.APIView):
         serializer = self.serializer_class(booth, context={'request': request})
 
         return Response({'message': '부스 좋아요 여부 변경 성공', 'data': serializer.data}, status=HTTP_200_OK)
+
+class BoothPagination(PageNumberPagination):
+    page_size = 10
+
+class SearchView(views.APIView,PaginationHandlerMixin):
+    serializer_class = BoothListSerializer
+    pagination_class = BoothPagination
+
+    def get(self, request):
+        user = request.user
+        keyword= request.GET.get('keyword')
+        search_type = request.GET.get('type')
+
+        booths = (Booth.objects.filter(name__icontains=keyword) | Booth.objects.filter(menus__menu__contains=keyword)).distinct()
+
+        if search_type == '부스':
+            booths = Booth.objects.filter(
+                Q(name__icontains=keyword) |
+                Q(menus__menu__icontains=keyword)
+            ).distinct()
+        elif search_type == '공연':
+            booths = Booth.objects.filter(
+                performances__name__icontains=keyword
+            ).distinct()
+        else:
+            booths = Booth.objects.all()
+
+        if user.is_authenticated:
+            for booth in booths:
+                if booth.like.filter(pk=user.id).exists():
+                    booth.is_liked = True
+
+        serializer = self.serializer_class(booths, many=True)
+
+
+        return Response({'message':'부스 검색 성공', 'data': serializer.data}, status=HTTP_200_OK)
+    
+    
+class BoothDetailView(views.APIView):
+    serializer_class = BoothDetailSerializer
+    permission_classes = [IsAuthorOrReadOnly]
+
+    def get_object(self, pk):
+        booth = get_object_or_404(Booth, pk=pk)
+        self.check_object_permissions(self.request, booth)
+        return booth
+
+    def get(self, request, pk):
+        user = request.user
+        booth = self.get_object(pk=pk)
+
+        if booth.like.filter(pk=user.id).exists():
+            booth.is_liked=True
+
+        serializer = self.serializer_class(booth)
+
+        return Response({'message': '부스 상세 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
+    
+class BoothListView(views.APIView):
+    serializer_class = BoothListSerializer
+    pagination_class = BoothPagination
+
+    def get(self, request):
+        day = request.GET.get('day', None)
+        college = request.GET.get('college', None)
+        type = request.GET.get('type')
+        page = request.GET.get('page', 1)
+
+        booths = Booth.objects.all()
+        if day:
+            booths = booths.filter(day=day)
+        if college:
+            booths = booths.filter(college=college)
+        if type:
+            booths = booths.filter(type=type)
+        total = len(booths)
+        total_page = math.ceil(total/10)
+        serializer = self.serializer_class(booths, many=True)
+
+
+
+        return Response({'message': "부스 목록 조회 성공","page":page, 'total': total, 
+                        'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
