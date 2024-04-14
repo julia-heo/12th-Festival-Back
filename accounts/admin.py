@@ -1,4 +1,5 @@
-import imp
+# import imp
+import importlib.util
 from django.contrib import admin
 from .models import User
 
