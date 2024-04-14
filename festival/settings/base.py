@@ -103,9 +103,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
     
     # runserver시 주석 해제
-    # "allauth.account.middleware.AccountMiddleware"
+    # "allauth.account.middleware.AccountMiddleware",
 ]
 
 # cors 
