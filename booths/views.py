@@ -109,3 +109,24 @@ class SearchView(views.APIView,PaginationHandlerMixin):
 
 
         return Response({'message':'부스 검색 성공', 'data': serializer.data}, status=HTTP_200_OK)
+    
+    
+class BoothDetailView(views.APIView):
+    serializer_class = BoothDetailSerializer
+    permission_classes = [IsAuthorOrReadOnly]
+
+    def get_object(self, pk):
+        booth = get_object_or_404(Booth, pk=pk)
+        self.check_object_permissions(self.request, booth)
+        return booth
+
+    def get(self, request, pk):
+        user = request.user
+        booth = self.get_object(pk=pk)
+
+        if booth.like.filter(pk=user.id).exists():
+            booth.is_liked=True
+
+        serializer = self.serializer_class(booth)
+
+        return Response({'message': '부스 상세 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
