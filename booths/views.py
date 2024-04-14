@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+import math
 from rest_framework import views
 from rest_framework.status import *
 from rest_framework.response import Response
@@ -130,3 +131,29 @@ class BoothDetailView(views.APIView):
         serializer = self.serializer_class(booth)
 
         return Response({'message': '부스 상세 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
+    
+class BoothListView(views.APIView):
+    serializer_class = BoothListSerializer
+    pagination_class = BoothPagination
+
+    def get(self, request):
+        day = request.GET.get('day', None)
+        college = request.GET.get('college', None)
+        type = request.GET.get('type')
+        page = request.GET.get('page', 1)
+
+        booths = Booth.objects.all()
+        if day:
+            booths = booths.filter(day=day)
+        if college:
+            booths = booths.filter(college=college)
+        if type:
+            booths = booths.filter(type=type)
+        total = len(booths)
+        total_page = math.ceil(total/10)
+        serializer = self.serializer_class(booths, many=True)
+
+
+
+        return Response({'message': "부스 목록 조회 성공","page":page, 'total': total, 
+                        'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
