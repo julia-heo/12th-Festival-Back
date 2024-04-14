@@ -51,3 +51,24 @@ class CommentDetailView(views.APIView):
         else:
             return Response({'message': '댓글 수정 실패', 'data': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
+class ChangeLikeView(views.APIView):
+    serializer_class = BoothDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        user = request.user
+        booth = get_object_or_404(Booth, pk=pk)
+        
+        if booth.like.filter(id=user.id).exists():  
+            booth.like.remove(user)
+            is_liked = False
+        else:  
+            booth.like.add(user)
+            is_liked = True
+
+        booth.is_liked = is_liked
+        booth.save()
+
+        serializer = self.serializer_class(booth, context={'request': request})
+
+        return Response({'message': '부스 좋아요 여부 변경 성공', 'data': serializer.data}, status=HTTP_200_OK)

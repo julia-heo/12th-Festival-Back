@@ -89,3 +89,24 @@ class MenuDetailView(views.APIView):
             serializer.save()
             return Response({'message': '메뉴 수정 성공', 'data': serializer.data}, status=HTTP_200_OK)
         return Response({'message': '메뉴 수정 실패', 'data': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+
+class ChangeLikeMenu(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk, menu_pk):
+        user = request.user
+        menu = get_object_or_404(Menu, pk=menu_pk, booth=pk)
+
+        if menu.like.filter(id=user.id).exists():  
+            menu.like.remove(user)
+            is_liked = False
+        else:  
+            menu.like.add(user)
+            is_liked = True
+
+        menu.is_liked = is_liked
+        menu.save()
+
+        serializer = MenuSerializer(menu, context={'request': request})
+
+        return Response({'message': '메뉴 좋아요 여부 변경 성공', 'data': serializer.data}, status=HTTP_200_OK)
