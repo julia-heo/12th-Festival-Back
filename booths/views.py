@@ -176,7 +176,7 @@ class HomeView(views.APIView):
             return Response({'message': "스크랩한 부스 목록 조회 성공",'data': serializers.data}, status=HTTP_200_OK)
         
         elif(type=="메뉴"):
-            menus = Menu.objects.filter(like=user.id)
+            menus = Menu.objects.filter(like=user.id)[:4]
             for menu in menus:
                 menu.is_liked=True
             total = len(menus)
@@ -187,7 +187,7 @@ class HomeView(views.APIView):
             return Response({'message': "스크랩한 메뉴 목록 조회 성공",'data': serializers.data}, status=HTTP_200_OK)
 
         elif(type=="공연"):
-            booths = Booth.objects.filter(like=user.id,performance=True)
+            booths = Booth.objects.filter(like=user.id,performance=True)[:4]
             for booth in booths:
                 booth.is_liked=True
             total = len(booths)
