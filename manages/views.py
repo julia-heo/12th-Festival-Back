@@ -110,3 +110,63 @@ class ChangeLikeMenu(views.APIView):
         serializer = MenuSerializer(menu, context={'request': request})
 
         return Response({'message': '메뉴 좋아요 여부 변경 성공', 'data': serializer.data}, status=HTTP_200_OK)
+
+
+
+class BoothDetailView(views.APIView):
+    serializer_class = BoothDetailSerializer
+
+    def get_object(self, pk):
+        booth = get_object_or_404(Booth, pk=pk)
+        self.check_object_permissions(self.request, booth)
+        return booth
+    
+    def get(self, request, pk):
+        booth = self.get_object(pk)
+        serializer = self.serializer_class(booth)
+        return Response({'message': '부스 상세 조회 성공', 'data': serializer.data})
+
+    def patch(self, request, pk):
+        booth = self.get_object(pk)
+        serializer = BoothDetailSerializer(instance=booth, data=request.data, partial=True)
+
+        if 'thumnail' in request.data:
+            file = request.FILES['thumnail']
+            folder = f"{pk}_images"  
+            file_url = FileUpload(s3_client).upload(file, folder)
+            request.data['thumnail'] = file_url
+
+        if serializer.is_valid():
+            serializer.save()
+
+            request_days = request.data.get('days', [])
+            existing_days = booth.days.all()
+
+            for request_day in request_days:
+                date = request_day.get('date')
+                existing_day = existing_days.filter(date=date).first()
+
+                if existing_day:
+                    existing_day.start_time = request_day.get('start_time')
+                    existing_day.end_time = request_day.get('end_time')
+                    existing_day.save()
+                else:
+                    day_of_week = self.get_day_from_date(date) 
+                    booth.days.create(
+                        date=date,
+                        day=day_of_week,
+                        start_time=request_day.get('start_time'),
+                        end_time=request_day.get('end_time')
+                    )
+
+            return Response({'message': '부스 정보 및 날짜 수정 성공', 'data': serializer.data}, status=HTTP_200_OK)
+        else:
+            return Response({'message': '부스 정보 및 날짜 수정 실패', 'errors': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+
+    def get_day_from_date(self, date):
+        date_day_mapping = {
+            8: '수요일',
+            9: '목요일',
+            10: '금요일'
+        }
+        return date_day_mapping.get(date)
