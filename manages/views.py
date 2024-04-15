@@ -165,8 +165,8 @@ class BoothDetailView(views.APIView):
 
     def get_day_from_date(self, date):
         date_day_mapping = {
-            8: 'wed',
-            9: 'th',
-            10: 'fri'
+            8: '수요일',
+            9: '목요일',
+            10: '금요일'
         }
         return date_day_mapping.get(date)
