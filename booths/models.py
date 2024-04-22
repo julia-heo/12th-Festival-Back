@@ -17,7 +17,9 @@ class Booth(TimeStamp):
         ('정문', '정문'),
         ('포스코관', '포스코관'),
         ('학문관', '학문관'),
-        ('휴웃길', '휴웃길')
+        ('휴웃길', '휴웃길'),
+        ('학관', '학관'),
+        ('잔디광장', '잔디광장')
         # 공연 위치정보 추가
     )
     CATEGORY_CHOICES = (
@@ -71,6 +73,7 @@ class Menu(TimeStamp):
     is_soldout = models.BooleanField(default=False)
     like = models.ManyToManyField(User, related_name='menus', blank=True)
     img = models.TextField(null=True, blank=True)
+    vegan=models.CharField(null=True, max_length=5)
 
     def __str__(self):
         return f'{self.menu}'
@@ -78,4 +81,25 @@ class Menu(TimeStamp):
 class Comment(TimeStamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+
+class Event(TimeStamp):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.TextField()
+    place=models.TextField()        #장소 필터링 + 넘버 없음
+    summary=models.TextField()      #리스트 목록에 보이는 한마디
+    thumnail = models.TextField(null=True, blank=True)
+    opened = models.BooleanField(default=False)
+    description = models.TextField(blank=True)
+    contact = models.TextField(blank=True)              
+    realtime = models.TextField(blank=True)             
+    
+    
+    def __str__(self):
+        return self.name
+    
+
+class EventComment(TimeStamp):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='event_comments')
+    event = models.ForeignKey(Booth, on_delete=models.CASCADE, related_name='event_comments')
     content = models.TextField()
