@@ -99,7 +99,3 @@ class Event(TimeStamp):
         return self.name
     
 
-class EventComment(TimeStamp):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='event_comments')
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_comments')
-    content = models.TextField()
