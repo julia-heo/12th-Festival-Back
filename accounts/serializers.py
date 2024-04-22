@@ -87,7 +87,7 @@ class LikeMenuSerializer(serializers.ModelSerializer):
     opened = serializers.SerializerMethodField()
     class Meta:
         model=Menu
-        fields=['id', 'name',"booth_id", 'info','thumnail','opened','is_liked']
+        fields=['id', 'name',"booth_id", 'info','thumnail','opened','is_liked','vegan']
     
     def get_name(self,obj):
         return obj.menu
