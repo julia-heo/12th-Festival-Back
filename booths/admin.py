@@ -19,3 +19,13 @@ class MenuAdmin(admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
 	list_display = ['id', 'user', 'booth', 'content', 'created_at', 'updated_at']
+
+@admin.register(Event)
+class EvnetAdmin(admin.ModelAdmin):
+	list_display = ['id', 'name', 'user', 'created_at', 'updated_at']
+	list_display_links = ['id','name']
+
+@admin.register(EventDay)
+class EventDayAdmin(admin.ModelAdmin):
+	list_display = ['id','day', 'event','start_time','end_time']
+	list_display_links = ['id','day']

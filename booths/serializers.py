@@ -9,7 +9,7 @@ class MenuSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     class Meta:
         model = Menu
-        fields = ['id', 'menu', 'price', 'is_soldout','is_liked','img']
+        fields = ['id', 'menu', 'price', 'is_soldout','is_liked','img','vegan']
     def get_is_liked(self,obj):   
         user = self.context.get('user') 
         return obj.like.filter(pk=user).exists()
@@ -24,7 +24,14 @@ class BoothListSerializer(serializers.ModelSerializer):
         fields=['id', 'name', 'info','thumnail','opened','is_liked']
     
     def get_info(self, obj):
-        return obj.college+" "+obj.number
+        if obj.performance==True:
+            string=""
+            days=Day.objects.filter(booth=obj)
+            for day in days:
+                string += "("+day.day[:1]+") "+day.start_time+" / "
+            string=string[:-3]+" · "+obj.category
+            return string
+        return obj.college+" "+obj.number+" · "+obj.category
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -55,7 +62,7 @@ class CommentPostSerializer(serializers.ModelSerializer):
 
 
 class BoothDetailSerializer(serializers.ModelSerializer):
-    day = serializers.StringRelatedField(many=True, read_only=True)
+    days = serializers.StringRelatedField(many=True, read_only=True)
     updated_at = serializers.SerializerMethodField()
     menus = serializers.SerializerMethodField()
     is_liked = serializers.BooleanField(default=False)
@@ -64,7 +71,7 @@ class BoothDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Booth
-        fields = ['id', 'user', 'day', 'college', 'category', 'name', 
+        fields = ['id', 'user', 'days', 'college', 'category', 'name', 
                   'number', 'thumnail', 'opened',
                   'description','is_liked', 'like_num', 'realtime', 'updated_at',
                  'contact', 'performance','menus','comments']
@@ -92,7 +99,7 @@ class MenuListSerializer(serializers.ModelSerializer):
     opened = serializers.SerializerMethodField()
     class Meta:
         model=Menu
-        fields=['id', 'name',"booth_id", 'info','thumnail','opened','is_liked']
+        fields=['id', 'name',"booth_id", 'info','thumnail','opened','is_liked','vegan']
     
     def get_name(self,obj):
         return obj.menu

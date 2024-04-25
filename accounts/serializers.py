@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-from booths.models import Booth, Menu
+from booths.models import Booth, Menu, Day
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -75,7 +75,14 @@ class LikeBoothSerializer(serializers.ModelSerializer):
         fields=['id', 'name', 'info','thumnail','opened','is_liked']
     
     def get_info(self, obj):
-        return obj.college+" "+obj.number
+        if obj.performance==True:
+            string=""
+            days=Day.objects.filter(booth=obj)
+            for day in days:
+                string += "("+day.day[:1]+") "+day.start_time+" / "
+            string=string[:-3]+" · "+obj.category
+            return string
+        return obj.college+" "+obj.number+" · "+obj.category
     
 
 class LikeMenuSerializer(serializers.ModelSerializer):
@@ -87,7 +94,7 @@ class LikeMenuSerializer(serializers.ModelSerializer):
     opened = serializers.SerializerMethodField()
     class Meta:
         model=Menu
-        fields=['id', 'name',"booth_id", 'info','thumnail','opened','is_liked']
+        fields=['id', 'name',"booth_id", 'info','thumnail','opened','is_liked','vegan']
     
     def get_name(self,obj):
         return obj.menu
