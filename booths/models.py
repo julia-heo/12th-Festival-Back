@@ -27,8 +27,10 @@ class Booth(TimeStamp):
         ('음식', '음식'),
         ('굿즈', '굿즈'),
         ('체험', '체험'),
+        # 공연 카테고리
+        ('댄스', '댄스'),
+        ('밴드', '밴드'),
         ('기타', '기타'),
-        # 공연 카테고리 추가
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -37,7 +39,7 @@ class Booth(TimeStamp):
     name = models.TextField()
     number = models.CharField(max_length=10, blank=True)
     thumnail = models.TextField(null=True, blank=True)
-    opened = models.BooleanField(default=False)
+    opened = models.BooleanField(default=True)
     description = models.TextField(blank=True)
     like = models.ManyToManyField(User, related_name='booths', blank=True)
     contact = models.TextField(blank=True)              # 운영진 연락처 
