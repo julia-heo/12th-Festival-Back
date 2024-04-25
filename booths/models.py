@@ -19,8 +19,9 @@ class Booth(TimeStamp):
         ('학문관', '학문관'),
         ('휴웃길', '휴웃길'),
         ('학관', '학관'),
-        ('잔디광장', '잔디광장')
-        # 공연 위치정보 추가
+        # 공연
+        ('학문관무대', '학문관무대'),
+        ('스포츠트랙', '스포츠트랙'),
     )
     CATEGORY_CHOICES = (
         ('음식', '음식'),
@@ -64,7 +65,7 @@ class Day(models.Model):
     end_time=models.CharField(max_length=5,null=False,blank=False)
 
     def __str__(self):
-        return f'{self.id}'
+        return f'{self.date}일 {self.day} - {self.start_time} ~ {self.end_time}'
     
 class Menu(TimeStamp):
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, related_name='menus')
@@ -99,3 +100,22 @@ class Event(TimeStamp):
         return self.name
     
 
+class EventDay(models.Model):
+    DAY_CHOICES = (
+        ('수요일', '수요일'),
+        ('목요일', '목요일'),
+        ('금요일', '금요일'),
+    )
+    DATE_CHOICES = (
+        (8, 8),
+        (9, 9),
+        (10, 10),
+    )
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='days')
+    day = models.CharField(choices=DAY_CHOICES, max_length=5)
+    date = models.IntegerField(choices=DATE_CHOICES)
+    start_time=models.CharField(max_length=5,null=False,blank=False)
+    end_time=models.CharField(max_length=5,null=False,blank=False)
+
+    def __str__(self):
+        return f'{self.id}'
