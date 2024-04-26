@@ -156,7 +156,42 @@ def password_change_view(request):
   else:
     return redirect('collects:detail')
 
-def update_menu_view(request):
+def update_menu_view(request,menu_id):
     if request.method == "POST":
-        user = request.user
+        menu_update = Menu.objects.get(id=menu_id)
+        booth_id=menu_update.booth.id
+        menu_update.menu = request.POST['menu']
+        menu_update.price = request.POST['price']
+        menu_update.vegan = request.POST['vegan']
+        file = request.FILES.get('menuimg')
+        if file:
+            folder = f"{booth_id}_images"  
+            file_url = FileUpload(s3_client).upload(file, folder)
+            menu_update.img=file_url
+
+        menu_update.save()
+        return redirect('collects:detail')
+    
+
+def delete_menu_view(request,menu_id):
+    if request.method == "POST":
+        menu_update = Menu.objects.get(pk=menu_id)
+        menu_update.delete()
+        return redirect('collects:detail')
+    
+def create_menu_view(request,booth_id):
+    if request.method == "POST":
+        booth=Booth.objects.get(pk=booth_id)
+        menu = Menu(
+            booth=booth,
+            menu = request.POST['menu'],
+            price = request.POST['price'],
+            vegan = request.POST['vegan']
+        )
+        file = request.FILES.get('menuimg')
+        if file:
+            folder = f"{booth_id}_images"  
+            file_url = FileUpload(s3_client).upload(file, folder)
+            menu.img=file_url
+        menu.save()
         return redirect('collects:detail')

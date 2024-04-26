@@ -37,9 +37,10 @@
         {% endif %}
     </p>
     <p>운영 시간 (예: 9:00 ~ 14:00)<br> 운영하는 요일을 반드시 체크 후 영업 시간을 입력해주세요!</p>
+    이부분은 수정 최소화 부탁드립니다!
     <ul>
         <p>
-            <input type="checkbox" name="day1" {% if day1.check %} checked {% endif %}>
+            <input type="checkbox" name="day1" id="day1_checked" {% if day1.check %} checked {% endif %}>
             <label for="day1">8일 수요일 
                     시작시간:
                     <input type="text" name="start_time_8" value="{{ day1.start_time }}"> 
@@ -48,8 +49,8 @@
             </label>
         </p>
         <p>
-            <input type="checkbox" name="day2" {% if day2.check %} checked {% endif %}>
-            <label for="day1">9일 목요일 
+            <input type="checkbox" name="day2" id="day2_checked" {% if day2.check %} checked {% endif %}>
+            <label for="day2">9일 목요일 
                     시작시간:
                     <input type="text" name="start_time_9" value="{{ day2.start_time }}"> 
                     끝나는시간:
@@ -58,8 +59,8 @@
         </p>
         <p>
             
-            <input type="checkbox" name="day3"  {% if day3.check %} checked {% endif %}>
-            <label for="day1">10일 금요일 
+            <input type="checkbox" name="day3" id="day3_checked" {% if day3.check %} checked {% endif %}>
+            <label for="day3">10일 금요일 
                     시작시간:
                     <input type="text" name="start_time_10" value="{{ day3.start_time }}"> 
                     끝나는시간:
@@ -75,21 +76,77 @@
         <img src="{{ booth.thumnail }}" alt="부스 썸네일"><br>
         <br>
         <input name="image" type="file"></p>
+        
+    <button type="submit">수정하기</button>
+    
+    </form>
+    <br><br>
     
     {% if not booth.performance %}
+    <h2>메뉴 수정</h2>
+    수정하기/삭제하기/추가한뒤 저장하기 버튼을 누를때마다 새로고침됩니다..
+    한번에 다적지 마시고 한 메뉴씩 작업 부탁드려요!
     {% for menu in menus %}
-        <div>
+        <div style="padding: 30px;">
+            <form action="{% url 'collects:update_menu' menu.id %}" method="post" enctype="multipart/form-data" >
+                {% csrf_token %}
+                
+                <p>메뉴명: <input type="text" name="menu" value="{{ menu.menu }}"  maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)"oninput="checkLength()"></p>
+                <p>가격: <input type="int" name="price" value="{{ menu.price }}"></p>
+                <p>비건 여부:
+                    <select name="vegan">
+                        <option value="논비건" {% if menu.vegan == '논비건' %} selected {% endif %}>논비건</option>
+                        <option value="비건" {% if menu.vegan == '비건' %} selected {% endif %}>비건</option>
+                        <option value="페스코" {% if menu.vegan == '페스코' %} selected {% endif %}>페스코</option>
+                    </select>
+                </p>
+                <img src="{{ menu.img }}" alt="메뉴 이미지" style="max-width: 100px;">
+                <input name="menuimg" type="file"></p>
+                <button type="submit">저장</button>
+            </form>
+            <form action="{% url 'collects:delete_menu' menu.id %}" method="post" >
+            {% csrf_token %}
+            <button type="submit">삭제</button>
+            </form>
 
         </div>
     {% endfor %}
-        
+    <div id="menuFormsContainer">
+    </div>
+    <button onclick="addMenuForm()">추가하기</button>
+
+    <!-- <div id="menuForm" style="display: none;" style="padding: 30px;">
+        <form action="{% url 'collects:create_menu' booth.id %}" method="post" enctype="multipart/form-data" >
+            {% csrf_token %}
+            
+            <p>메뉴명: <input type="text" name="menu"  maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)"oninput="checkLength()"></p>
+            <p>가격: <input type="int" name="price"></p>
+            <p>비건 여부:
+                <select name="vegan">
+                    <option value="논비건" >논비건</option>
+                    <option value="비건" >비건</option>
+                    <option value="페스코" ></option>
+                </select>
+            </p>
+            <input name="menuimg" type="file"></p>
+            <button type="submit">저장</button>
+        </form>
+       
+
+    </div>
+    <script>
+        function showMenuForm() {
+            var menuForm = document.getElementById("menuForm");
+            menuForm.style.display = "block";
+        }
+    </script>
+    
+    <button onclick="showMenuForm()">추가하기</button> -->
+    
     {% endif %}
 
 
-    
-    <button type="submit">수정하기</button>
-    
-</form>
+
 <p>문제 발생 시 ~~로 연락주세요</p>
 
 
@@ -101,30 +158,62 @@
             }
         }
     function checkTime() {
-        var day1_checkbox = document.getElementById("day1_checkbox");
-        print(day1_checkbox)
+        const checkbox1 = document.getElementById('day1_checked');
+        const is_checked1 = checkbox1.checked;
         var start_time_8 = document.getElementsByName("start_time_8")[0].value;
         var end_time_8 = document.getElementsByName("end_time_8")[0].value;
-        if (day1_checkbox.checked) {
-            if (start_time_8.trim() === '' || end_time_8.trim() === '') {
-                alert("시작 시간과 종료 시간을 입력해주세요!");
-                return false;
-            }
-        }
-        var start_time_9 = document.getElementsByName("start_time_9")[0].value;
-        var end_time_9 = document.getElementsByName("end_time_9")[0].value;
-
-        if (start_time_9.trim() === '' || end_time_9.trim() === '') {
+        if (is_checked1 && (start_time_8.trim() === '' || end_time_8.trim() === '')) {
             alert("시작 시간과 종료 시간을 입력해주세요!");
             return false;
         }
 
+        const checkbox2 = document.getElementById('day2_checked');
+        const is_checked2 = checkbox2.checked;
+        var start_time_9 = document.getElementsByName("start_time_9")[0].value;
+        var end_time_9 = document.getElementsByName("end_time_9")[0].value;
+        if (is_checked2 &&(start_time_9.trim() === '' || end_time_9.trim() === '')) {
+            alert("시작 시간과 종료 시간을 입력해주세요!");
+            return false;
+        }
+
+        const checkbox3 = document.getElementById('day3_checked');
+        const is_checked3 = checkbox3.checked;
         var start_time_10 = document.getElementsByName("start_time_10")[0].value;
         var end_time_10 = document.getElementsByName("end_time_10")[0].value;
-        if (start_time_10.trim() === '' || end_time_10.trim() === '') {
+        if (is_checked3 && (start_time_10.trim() === '' || end_time_10.trim() === '')) {
             alert("시작 시간과 종료 시간을 입력해주세요!");
             return false;
         }
         return true;
+    }
+
+    var menuCount = 0;
+
+    function addMenuForm() {
+        menuCount++;
+
+        var menuFormsContainer = document.getElementById("menuFormsContainer");
+
+        var menuForm = document.createElement("div");
+        menuForm.setAttribute("style", "padding: 30px;");
+
+        menuForm.innerHTML = `
+            <form action="{% url 'collects:create_menu' booth.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <p>메뉴명: <input type="text" name="menu" maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)" oninput="checkLength()"></p>
+                <p>가격: <input type="number" name="price"></p>
+                <p>비건 여부:
+                    <select name="vegan">
+                        <option value="논비건">논비건</option>
+                        <option value="비건">비건</option>
+                        <option value="페스코"></option>
+                    </select>
+                </p>
+                <input name="menuimg" type="file">
+                <button type="submit">저장</button>
+            </form>
+        `;
+
+        menuFormsContainer.appendChild(menuForm);
     }
 </script>
