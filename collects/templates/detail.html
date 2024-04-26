@@ -6,8 +6,13 @@
     </script>
 {% endif %}
 
-<h1>{{booth.college}} {{booth.number}} {{ user.nickname }}</h1>
-본인 부스/공연이 맞는지 반드시 확인해주세요! <a class="nav-link" href="{% url 'collects:logout' %}">로그아웃</a>
+<h1>{{booth.college}} {{booth.number}} {{ user.nickname }}</h1><a class="nav-link" href="{% url 'collects:logout' %}">로그아웃</a>
+
+<br>
+본인 부스/공연이 맞는지 반드시 확인해주세요!
+<hr>
+보안을 위해 반드시 비밀번호를 변경해주세요<br>
+비밀번호 변경 후에는 암호화되어 따로 찾을 수 있는 방법이 없습니다. 꼭 제출 전 캡쳐를 하거나 따로 기재해두기를 부탁드립니다!
 <form method="post" action="{% url 'collects:password_change' %}">
     {% csrf_token %}
     <p>현재 비밀번호: <input type="password" name="current_password"></p>
@@ -15,12 +20,21 @@
     <p>새로운 비밀번호 확인: <input type="password" name="new_password2"></p>
     <button type="submit">비밀번호 변경</button>
 </form>
-
+<hr>
 <form action="{% url 'collects:update' booth.id %}" method="post" enctype="multipart/form-data" onsubmit="return checkTime()">
 
     {% csrf_token %}
-    <p>이름: <input type="text" name="name" id="boothName" value="{{ booth.name }}" maxlength="14" placeholder="부스명을 입력해주세요 (최대 14자)" oninput="checkLength()"></p>
-    <p>카테고리: (대동제 홈페이지에서 변경불가, 추가 원하면 연락주세요)
+    <h3>이름: </h3>
+    <p>
+        [텍스트] 24자 이하<br>
+        <input type="text" name="name" id="boothName" value="{{ booth.name }}" maxlength="14" placeholder="부스명을 입력해주세요 (최대 14자)" oninput="checkLength()">
+    </p>
+    
+    <h3>카테고리: </h3>
+    <p>(대동제 홈페이지에서 실시간 변경불가, 카테고리 항목 추가 요청있다면 멋사로)<br>
+        [부스] ‘음식’ 또는 ‘굿즈’ 또는 ‘체험’ 또는 ‘기타’ 中 택 1<br>
+        [공연] ‘밴드’ 또는 ‘댄스’ 또는 ‘기타’ 中 택 1<br>
+        프로모션은 ‘기타’ 카테고리에 포함됩니다.<br>
         {% if booth.performance %}
         <select name="category">
             <option value="밴드" {% if booth.category == '밴드' %} selected {% endif %}>밴드</option>
@@ -36,8 +50,13 @@
         </select>
         {% endif %}
     </p>
-    <p>운영 시간 (예: 9:00 ~ 14:00)<br> 운영하는 요일을 반드시 체크 후 영업 시간을 입력해주세요!</p>
-    이부분은 수정 최소화 부탁드립니다!
+    <h3>운영 시간:</h3>
+    <p> (예: 9:00 ~ 14:00)<br> 
+        [선택지] ‘8일 수요일’ 또는 ‘9일 목요일’ 또는 ‘10일 금요일’ 中 해당하는 모든 선택지 중복 선택<br>
+        선택한 날짜에 대해 운영 시간 입력. 체크하지 않을 경우 반영되지 않음.<br>
+        반드시 24시간제 시간 표기법으로 시:분 형식으로 표기해 주세요.<br>
+    </p>
+    운영 시간은 수정 최소화 부탁드립니다!
     <ul>
         <p>
             <input type="checkbox" name="day1" id="day1_checked" {% if day1.check %} checked {% endif %}>
@@ -69,10 +88,20 @@
         </p>
 
     </ul>
-    <p>소개글: <br>&nbsp;&nbsp;<textarea name="description" maxlength="100" placeholder="부스에 대해 알리는 소개글을 작성해주세요(최대 100자)" oninput="if(this.value.length > 100) this.value = this.value.slice(0, 100)" cols="70" rows="5">{{ booth.description }}</textarea></p>
-    <p>운영진 연락처: <input type="text" name="contact" value="{{ booth.contact }}"></p>
-    <p>실시간 공지사항: <br>&nbsp;&nbsp;<textarea name="realtime" maxlength="100" placeholder="실시간으로 알리고 싶은 정보를 작성해주세요(최대 100자)" cols="70" rows="5">{{ booth.realtime }}</textarea></p>
-    <p>썸네일<br>
+    <h3>소개글: </h3>
+    [텍스트] 상세 설명, 글자수 제한 100 / 문자 조건 없음(이모티콘 가능)
+    <p>&nbsp;&nbsp;<textarea name="description" maxlength="100" placeholder="부스에 대해 알리는 소개글을 작성해주세요(최대 100자)" oninput="if(this.value.length > 100) this.value = this.value.slice(0, 100)" cols="70" rows="5">{{ booth.description }}</textarea></p>
+    <h3>운영진 연락처: </h3>
+    <input type="text" name="contact" value="{{ booth.contact }}">
+    <h3>실시간 공지사항: </h3>
+    <p>
+        [텍스트] 100자 이하, 문자 조건 없음(이모티콘 가능)<br>
+        - 계속해서 실시간으로 수정 가능한 공지사항 전달 창구입니다. 첫날 부스 오픈 이전에 미리 전달하고 싶은 내용이 있다면 작성해주세요.<br>
+         만약 없다면 비워주셔도 괜찮습니다. 직접 수정 전까지 ‘아직 공지사항이 없습니다.’라는 문구가 들어갈 예정입니다.<br>&nbsp;&nbsp;
+        <textarea name="realtime" maxlength="100" placeholder="실시간으로 알리고 싶은 정보를 작성해주세요(최대 100자)" cols="70" rows="5">{{ booth.realtime }}</textarea>
+    </p>
+    <h3>썸네일</h3>
+    <p>
         <img src="{{ booth.thumnail }}" alt="부스 썸네일"><br>
         <br>
         <input name="image" type="file"></p>
@@ -81,18 +110,23 @@
     
     </form>
     <br><br>
-    
+    <hr>
     {% if not booth.performance %}
     <h2>메뉴 수정</h2>
     수정하기/삭제하기/추가한뒤 저장하기 버튼을 누를때마다 새로고침됩니다..
     한번에 다적지 마시고 한 메뉴씩 작업 부탁드려요!
+
     {% for menu in menus %}
         <div style="padding: 30px;">
             <form action="{% url 'collects:update_menu' menu.id %}" method="post" enctype="multipart/form-data" >
                 {% csrf_token %}
-                
-                <p>메뉴명: <input type="text" name="menu" value="{{ menu.menu }}"  maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)"oninput="checkLength()"></p>
-                <p>가격: <input type="int" name="price" value="{{ menu.price }}"></p>
+                <h3>메뉴명:</h3>
+                [텍스트] 14자 이하
+                <input type="text" name="menu" value="{{ menu.menu }}"  maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)" oninput="checkLength()">
+                <h3>가격:</h3>
+                [숫자] 10,000,000원(천만원) 이상 불가 (7자리까지 가능)<br>
+                - 가격의 경우 쉼표와 원을 제외하고 오직 숫자만 입력합니다.
+                <input type="int" name="price" value="{{ menu.price }}">
                 <p>비건 여부:
                     <select name="vegan">
                         <option value="논비건" {% if menu.vegan == '논비건' %} selected {% endif %}>논비건</option>
@@ -102,7 +136,7 @@
                 </p>
                 <img src="{{ menu.img }}" alt="메뉴 이미지" style="max-width: 100px;">
                 <input name="menuimg" type="file"></p>
-                <button type="submit">저장</button>
+                <button type="submit">수정</button>
             </form>
             <form action="{% url 'collects:delete_menu' menu.id %}" method="post" >
             {% csrf_token %}
@@ -110,44 +144,18 @@
             </form>
 
         </div>
+        <hr color="#f5f5f5">
     {% endfor %}
     <div id="menuFormsContainer">
     </div>
     <button onclick="addMenuForm()">추가하기</button>
 
-    <!-- <div id="menuForm" style="display: none;" style="padding: 30px;">
-        <form action="{% url 'collects:create_menu' booth.id %}" method="post" enctype="multipart/form-data" >
-            {% csrf_token %}
-            
-            <p>메뉴명: <input type="text" name="menu"  maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)"oninput="checkLength()"></p>
-            <p>가격: <input type="int" name="price"></p>
-            <p>비건 여부:
-                <select name="vegan">
-                    <option value="논비건" >논비건</option>
-                    <option value="비건" >비건</option>
-                    <option value="페스코" ></option>
-                </select>
-            </p>
-            <input name="menuimg" type="file"></p>
-            <button type="submit">저장</button>
-        </form>
-       
-
-    </div>
-    <script>
-        function showMenuForm() {
-            var menuForm = document.getElementById("menuForm");
-            menuForm.style.display = "block";
-        }
-    </script>
-    
-    <button onclick="showMenuForm()">추가하기</button> -->
     
     {% endif %}
 
 
 
-<p>문제 발생 시 ~~로 연락주세요</p>
+<p>문제 발생 시 [멋쟁이 사자처럼 카카오 채널](https://pf.kakao.com/_htxexfd)로 연락주세요</p>
 
 
 <script>
