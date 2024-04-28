@@ -4,7 +4,8 @@ from rest_framework import views
 from rest_framework.status import *
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import *
-from .storages import FileUpload, s3_client
+from booths.models import * 
+from manages.storages import FileUpload, s3_client
 from .serializers import *
 from rest_framework.pagination import PageNumberPagination
 from .pagination import PaginationHandlerMixin
@@ -75,24 +76,36 @@ class NoticeDetailView(views.APIView):
 
         return Response({'message': 'TF 공지 삭제 성공'}, status=HTTP_204_NO_CONTENT)
 
+
 class EventListView(views.APIView):
     serializer_class = EventListSerializer
     permission_classes = [IsTFOrReadOnly]
-    def get(self):
-        events=Event.objects.all()
+    
+    def get(self, request):
+        day = request.query_params.get('day')
+        if day:
+            events = Event.objects.filter(days__day=day)
+        else:
+            events = Event.objects.all()
+
         serializer = self.serializer_class(events, many=True)
 
-        return Response({'message': 'TF 이벤트 목록 조회 성공','data': serializer.data}, status=HTTP_200_OK)
-
+        return Response({'message': 'TF 이벤트 목록 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
+    
 class EventDetailView(views.APIView):
-    serializer_class = EventListSerializer
+    serializer_class = EventDetailSerializer
     permission_classes = [IsTFOrReadOnly]
-    def get(self, pk):
+    def get_object(self, pk):
+        event = get_object_or_404(Event, pk=pk)
+        self.check_object_permissions(self.request, event)
+
+        return event
+
+    def get(self, request, pk):
         event = self.get_object(pk=pk)
         serializer = self.serializer_class(event)
-
-        return Response({'message': 'TF 이벤트 상세 조회 성공', 'data': serializer.data})
-    
+        return Response({'message': 'TF 부스 상세 조회 성공', 'data': serializer.data})
+    '''
     def patch(self, request, pk):
         event = self.get_object(pk)
         serializer = EventDetailSerializer(instance=event, data=request.data, partial=True)
@@ -138,3 +151,4 @@ class EventDetailView(views.APIView):
         }
         return date_day_mapping.get(date)
 
+'''
