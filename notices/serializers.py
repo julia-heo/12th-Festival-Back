@@ -28,5 +28,5 @@ class EventDetailSerializer(serializers.ModelSerializer):
                 'description','contact','realtime']
 
     def get_updated_at(self, obj):
-        return obj.updated_at.strftime("%#m월 %#d일 %#H시 %#M분")
+        return obj.updated_at.strftime("%-m월 %-d일 %-H시 %-M분")
     
