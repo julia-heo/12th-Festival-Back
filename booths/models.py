@@ -40,11 +40,11 @@ class Booth(TimeStamp):
     number = models.CharField(max_length=10, blank=True)
     thumnail = models.TextField(null=True, blank=True)
     opened = models.BooleanField(default=True)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     like = models.ManyToManyField(User, related_name='booths', blank=True)
-    contact = models.TextField(blank=True)              # 운영진 연락처 
-    realtime = models.TextField(blank=True)             # 실시간 공지사항
-    performance = models.BooleanField(default=False)    # 공연 여부 (부스False 공연True)
+    contact = models.TextField(blank=True, null=True)              # 운영진 연락처 
+    realtime = models.TextField(blank=True, null=True)             # 실시간 공지사항
+    performance = models.BooleanField(default=False)               # 공연 여부 (부스False 공연True)
     
     def __str__(self):
         return self.name
@@ -90,12 +90,12 @@ class Event(TimeStamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.TextField()
     place=models.TextField()        #장소 필터링 + 넘버 없음
-    summary=models.TextField()      #리스트 목록에 보이는 한마디
+    summary=models.TextField(null=True)      #리스트 목록에 보이는 한마디
     thumnail = models.TextField(null=True, blank=True)
     opened = models.BooleanField(default=False)
-    description = models.TextField(blank=True)
-    contact = models.TextField(blank=True)              
-    realtime = models.TextField(blank=True)             
+    description = models.TextField(blank=True, null=True)
+    contact = models.TextField(blank=True, null=True)              
+    realtime = models.TextField(blank=True, null=True)             
     
     
     def __str__(self):

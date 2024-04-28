@@ -1,0 +1,113 @@
+{% if messages %}
+    <script>
+        {% for message in messages %}
+            alert("{{ message }}");
+        {% endfor %}
+    </script>
+{% endif %}
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .event {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        .event:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .event h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .event p {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .event a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .container {
+            width: 100%; 
+            max-width: 400px;
+            height: 600px; 
+            overflow-x: auto; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        .image {
+            display: block; 
+            max-width: 100%;
+        }
+    </style>
+
+
+<h1>이벤트 목록</h1>
+이벤트 정렬은 선택 요일별로, 순서는 이 페이지에서 <strong>작성한 순서대로</strong>입니다!!<br>
+이벤트 진행 시간 순서대로 정렬을 원하신다면, 일정표대로 일찍 시작하는 이벤트부터 작성해주세요<br><br>
+클릭해 수정/삭제 가능
+{% for event in events %}
+<div class="event" onclick="window.location='{% url 'collects:event_detail' event.id %}'">
+    <h2>{{ event.name }}</h2>
+    <p><strong>요약:</strong> {{ event.summary }}</p>
+</div>
+{% endfor %}
+
+
+<form action="{% url 'collects:event_add_page' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">추가</button>
+</form>
+
+<br><br>
+
+아래 사이트 예시 캡쳐를 참고하면 어떤 곳에 들어갈 항목인지 확인할 수 있습니다!
+<div>
+<div style="float: left; width: 50%;">
+    1. 이벤트(축준위 부스) 리스트
+    <div class="container">
+        <img class="image" src="https://festivalewha.s3.ap-northeast-2.amazonaws.com/example/example_event_list.png" >
+    </div>
+</div>
+<div style="float: right; width: 50%;">
+    2. 상세 페이지
+    <div class="container">
+        <img class="image" src="https://festivalewha.s3.ap-northeast-2.amazonaws.com/example/example_event_detail.png" >
+    </div>
+
+</div>
+</div>

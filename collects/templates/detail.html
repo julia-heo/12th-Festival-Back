@@ -5,12 +5,130 @@
         {% endfor %}
     </script>
 {% endif %}
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
 
-<h1>{{booth.college}} {{booth.number}} {{ user.nickname }}</h1><a class="nav-link" href="{% url 'collects:logout' %}">로그아웃</a>
+        .container {
+            width: 100%; 
+            max-width: 400px;
+            height: 600px; 
+            overflow-x: auto; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
 
+        .image {
+            display: block; 
+            max-width: 100%;
+        }
+
+
+        a {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="int"],
+        select,
+        textarea {
+            padding: 8px;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        button[id="add"] {
+            background-color: #45a049;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #menuFormsContainer button {
+            margin-top: 10px;
+        }
+
+        #menuFormsContainer {
+            margin-top: 20px;
+        }
+
+        hr.color {
+            color: #f5f5f5;
+        }
+
+        h2 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        h3 {
+            margin-top: 20px;
+            color: #333;
+        }
+</style>
+
+<h1>{{booth.college}} {{booth.number}} {{ user.nickname }}</h1>
+<form action="{% url 'collects:logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;">로그아웃</button>
+</form>
 <br>
 본인 부스/공연이 맞는지 반드시 확인해주세요!
-<hr>
+<hr style="border: 0;border-top: 1px solid #ccc;">
 보안을 위해 반드시 비밀번호를 변경해주세요<br>
 비밀번호 변경 후에는 암호화되어 따로 찾을 수 있는 방법이 없습니다. 꼭 제출 전 캡쳐를 하거나 따로 기재해두기를 부탁드립니다!
 <form method="post" action="{% url 'collects:password_change' %}">
@@ -20,14 +138,26 @@
     <p>새로운 비밀번호 확인: <input type="password" name="new_password2"></p>
     <button type="submit">비밀번호 변경</button>
 </form>
-<hr>
-<form action="{% url 'collects:update' booth.id %}" method="post" enctype="multipart/form-data" onsubmit="return checkTime()">
+<hr style="border: 0;border-top: 1px solid #ccc;">
+아래 사이트 예시 캡쳐를 참고하면 어떤 곳에 들어갈 항목인지 확인할 수 있습니다!
+{% if not booth.performance %}
+<div class="container">
+    <img class="image" src="https://festivalewha.s3.ap-northeast-2.amazonaws.com/example/example_booth.png">
+</div>
+{% else %}
+<div class="container">
+    <img class="image" src="https://festivalewha.s3.ap-northeast-2.amazonaws.com/example/example_performance.png" >
+</div>
+{% endif %}
 
+<hr style="border: 0;border-top: 1px solid #ccc;">
+<form action="{% url 'collects:update' booth.id %}" method="post" enctype="multipart/form-data" onsubmit="return checkTime()">
+    특별히 조건을 언급하지 않은 항목의 텍스트는 한글/영어/숫자만 사용합니다. 특히 이모티콘(이모지)의 경우 ‘실시간 공지사항’, ‘부스 소개’를 제외하고 사용하지 않습니다.
     {% csrf_token %}
     <h3>이름: </h3>
     <p>
-        [텍스트] 24자 이하<br>
-        <input type="text" name="name" id="boothName" value="{{ booth.name }}" maxlength="14" placeholder="부스명을 입력해주세요 (최대 14자)" oninput="checkLength()">
+        [텍스트] 14자 이하<br>
+        &nbsp;&nbsp;<input type="text" name="name" id="boothName" value="{{ booth.name }}" maxlength="14" style="width: 250" placeholder="부스명을 입력해주세요 (최대 14자)" oninput="checkLength()">
     </p>
     
     <h3>카테고리: </h3>
@@ -92,7 +222,11 @@
     [텍스트] 상세 설명, 글자수 제한 100 / 문자 조건 없음(이모티콘 가능)
     <p>&nbsp;&nbsp;<textarea name="description" maxlength="100" placeholder="부스에 대해 알리는 소개글을 작성해주세요(최대 100자)" oninput="if(this.value.length > 100) this.value = this.value.slice(0, 100)" cols="70" rows="5">{{ booth.description }}</textarea></p>
     <h3>운영진 연락처: </h3>
-    <input type="text" name="contact" value="{{ booth.contact }}">
+    <p>
+        부스 운영진과 연락 가능한 연락처 링크(오픈채팅방, 카톡채널, 인스타그램 등)를 입력해주세요<br>
+        빈칸으로 두셔도 됩니다!<br>
+        &nbsp;&nbsp;<input type="text" name="contact" style="width: 400;" value="{{ booth.contact }}">
+    </p>
     <h3>실시간 공지사항: </h3>
     <p>
         [텍스트] 100자 이하, 문자 조건 없음(이모티콘 가능)<br>
@@ -102,30 +236,35 @@
     </p>
     <h3>썸네일</h3>
     <p>
-        <img src="{{ booth.thumnail }}" alt="부스 썸네일"><br>
+        등록된 이미지:
+        <img src="{{ booth.thumnail }}" style="max-width: 100px;" alt="부스 썸네일"><br>
         <br>
+        [이미지] 1장, 정사각형 또는 가로로 긴 직사각형의 이미지<br>
         <input name="image" type="file"></p>
-        
-    <button type="submit">수정하기</button>
+        <br>
+    <button type="submit">저장하기</button>
+    {% if not booth.performance %}
+        <p style="color:gray;">메뉴 수정/입력 전에 부스 내용의 변경사항을 저장해주세요!</p>
+    {% endif %}
     
     </form>
     <br><br>
-    <hr>
+    <hr style="border: 0;border-top: 1px solid #ccc;">
     {% if not booth.performance %}
     <h2>메뉴 수정</h2>
-    수정하기/삭제하기/추가한뒤 저장하기 버튼을 누를때마다 새로고침됩니다..
+    메뉴수정/메뉴삭제/저장 버튼을 누를때마다 새로고침됩니다..
     한번에 다적지 마시고 한 메뉴씩 작업 부탁드려요!
-
+    <hr style="border: none; border-top: 1px dashed #ccc;">
     {% for menu in menus %}
         <div style="padding: 30px;">
             <form action="{% url 'collects:update_menu' menu.id %}" method="post" enctype="multipart/form-data" >
                 {% csrf_token %}
                 <h3>메뉴명:</h3>
-                [텍스트] 14자 이하
+                [텍스트] 14자 이하<br>
                 <input type="text" name="menu" value="{{ menu.menu }}"  maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)" oninput="checkLength()">
                 <h3>가격:</h3>
                 [숫자] 10,000,000원(천만원) 이상 불가 (7자리까지 가능)<br>
-                - 가격의 경우 쉼표와 원을 제외하고 오직 숫자만 입력합니다.
+                - 가격의 경우 쉼표와 원을 제외하고 오직 숫자만 입력합니다.<br>
                 <input type="int" name="price" value="{{ menu.price }}">
                 <p>비건 여부:
                     <select name="vegan">
@@ -136,26 +275,26 @@
                 </p>
                 <img src="{{ menu.img }}" alt="메뉴 이미지" style="max-width: 100px;">
                 <input name="menuimg" type="file"></p>
-                <button type="submit">수정</button>
+                <button type="submit">메뉴 수정</button>
             </form>
             <form action="{% url 'collects:delete_menu' menu.id %}" method="post" >
             {% csrf_token %}
-            <button type="submit">삭제</button>
+            <button type="submit">메뉴 삭제</button>
             </form>
 
         </div>
-        <hr color="#f5f5f5">
+        <hr style="border: none; border-top: 1px dashed #ccc;">
     {% endfor %}
     <div id="menuFormsContainer">
     </div>
-    <button onclick="addMenuForm()">추가하기</button>
+    <button onclick="addMenuForm()" id="add">새로운 메뉴 추가하기</button>
 
     
     {% endif %}
 
 
 
-<p>문제 발생 시 [멋쟁이 사자처럼 카카오 채널](https://pf.kakao.com/_htxexfd)로 연락주세요</p>
+<p>문제 발생 시 <a href="https://pf.kakao.com/_htxexfd">멋쟁이 사자처럼 카카오 채널</a>로 연락주세요</p>
 
 
 <script>
@@ -209,12 +348,12 @@
             <form action="{% url 'collects:create_menu' booth.id %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <p>메뉴명: <input type="text" name="menu" maxlength="14" placeholder="메뉴명을 입력해주세요(최대 14자)" oninput="checkLength()"></p>
-                <p>가격: <input type="number" name="price"></p>
+                <p>가격: <input type="int" name="price"></p>
                 <p>비건 여부:
                     <select name="vegan">
                         <option value="논비건">논비건</option>
                         <option value="비건">비건</option>
-                        <option value="페스코"></option>
+                        <option value="페스코">페스코</option>
                     </select>
                 </p>
                 <input name="menuimg" type="file">

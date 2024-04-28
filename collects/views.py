@@ -7,7 +7,7 @@ from rest_framework.status import *
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from accounts.models import User
-from booths.models import Booth, Day, Menu
+from booths.models import Booth, Day, Menu, Event, EventDay
 from django.utils import timezone
 from manages.storages import FileUpload, s3_client
 from django.contrib.auth import update_session_auth_hash
@@ -195,3 +195,193 @@ def create_menu_view(request,booth_id):
             menu.img=file_url
         menu.save()
         return redirect('collects:detail')
+    
+def event_list_view(request):
+    events=Event.objects.all()
+    return render(request, 'eventlist.html',{'events': events})
+
+def event_detail_view(request,event_id):
+    event=Event.objects.get(id=event_id)
+    day1 = event.days.filter(date=8).first()
+    if day1 is None:
+        day1=Day(date=None, start_time='', end_time='')
+        day1.check=False
+    else:
+        day1.check=True
+    day2 = event.days.filter(date=9).first()
+    if day2 is None:
+        day2=Day(date=None, start_time='', end_time='')
+        day2.check=False
+    else:
+        day2.check=True
+    day3 = event.days.filter(date=10).first()
+    if day3 is None:
+        day3=Day(date=None, start_time='', end_time='')
+        day3.check=False
+    else:
+        day3.check=True
+    return render(request, 'eventdetail.html',{'event': event, 'day1': day1,'day2': day2,'day3': day3,})
+
+
+def event_update_view(request,event_id):
+    if request.method == "POST":
+        event=Event.objects.get(pk=event_id)
+        event.name=request.POST['name']
+        event.place=request.POST['place']
+        event.summary=request.POST['summary']
+        event.updated_at=timezone.now()
+        event.description=request.POST['description']
+        event.contact=request.POST['contact']
+        event.realtime=request.POST['realtime']
+        
+        file = request.FILES.get('image')
+        if file:
+            folder = f"event_images"  
+            file_url = FileUpload(s3_client).upload(file, folder)
+            event.thumnail=file_url
+
+        event.save()
+        if 'day1' in request.POST:
+            try:
+                day = EventDay.objects.get(event=event_id,date=8)
+                if day:
+                    day.start_time=request.POST['start_time_8']
+                    day.end_time=request.POST['end_time_8']
+                    day.save()
+            except EventDay.DoesNotExist:
+                event=Event.objects.get(id=event_id)
+                day = EventDay(event=event,date=8,day="수요일", start_time=request.POST['start_time_8'], end_time=request.POST['end_time_8'])
+                day.save()
+        else:
+            try:
+                day = EventDay.objects.get(event=event_id, date=8)
+                day.delete()
+            except EventDay.DoesNotExist:
+                pass
+
+        if 'day2' in request.POST:
+            try:
+                day = EventDay.objects.get(event=event_id,date=9)
+                if day:
+                    day.start_time=request.POST['start_time_9']
+                    day.end_time=request.POST['end_time_9']
+                    day.save()
+            except EventDay.DoesNotExist:
+                event=Event.objects.get(id=event_id)
+                day = EventDay(event=event,date=9,day="목요일", start_time=request.POST['start_time_9'], end_time=request.POST['end_time_9'])
+                day.save()
+        else:
+            try:
+                day = EventDay.objects.get(event=event_id, date=9)
+                day.delete()
+            except EventDay.DoesNotExist:
+                pass
+
+        if 'day3' in request.POST:
+            try:
+                day = EventDay.objects.get(event=event_id,date=10)
+                if day:
+                    day.start_time=request.POST['start_time_10']
+                    day.end_time=request.POST['end_time_10']
+                    day.save()
+            except EventDay.DoesNotExist:
+                event=Event.objects.get(id=event_id)
+                day = EventDay(event=event,date=10,day="금요일", start_time=request.POST['start_time_10'], end_time=request.POST['end_time_10'])
+                day.save()
+        else:
+            try:
+                day = EventDay.objects.get(event=event_id, date=10)
+                day.delete()
+            except EventDay.DoesNotExist:
+                pass
+            
+        messages.success(request, '수정이 완료되었습니다!')
+        return redirect('collects:event_detail',event_id=event.id)
+
+def event_delete_view(request,event_id):
+    if request.method == "POST":
+        event = Event.objects.get(pk=event_id)
+        event.delete()
+        return redirect('collects:event_list')
+
+def event_add_page_view(request):
+    return render(request, 'eventadd.html')
+
+
+def event_add_view(request):
+    if request.method == "POST":
+        event=Event(
+            name=request.POST['name'],
+            place=request.POST['place'],
+            summary=request.POST['summary'],
+            updated_at=timezone.now(),
+            description=request.POST['description'],
+            contact=request.POST['contact'],
+            realtime=request.POST['realtime'],
+            user=User.objects.get(id=1)
+        )
+        file = request.FILES.get('image')
+        if file:
+            folder = f"event_images"  
+            file_url = FileUpload(s3_client).upload(file, folder)
+            event.thumnail=file_url
+
+        event.save()
+        event_id=event.id
+        if 'day1' in request.POST:
+            try:
+                day = EventDay.objects.get(event=event_id,date=8)
+                if day:
+                    day.start_time=request.POST['start_time_8']
+                    day.end_time=request.POST['end_time_8']
+                    day.save()
+            except EventDay.DoesNotExist:
+                event=Event.objects.get(id=event_id)
+                day = EventDay(event=event,date=8,day="수요일", start_time=request.POST['start_time_8'], end_time=request.POST['end_time_8'])
+                day.save()
+        else:
+            try:
+                day = EventDay.objects.get(event=event_id, date=8)
+                day.delete()
+            except EventDay.DoesNotExist:
+                pass
+
+        if 'day2' in request.POST:
+            try:
+                day = EventDay.objects.get(event=event_id,date=9)
+                if day:
+                    day.start_time=request.POST['start_time_9']
+                    day.end_time=request.POST['end_time_9']
+                    day.save()
+            except EventDay.DoesNotExist:
+                event=Event.objects.get(id=event_id)
+                day = EventDay(event=event,date=9,day="목요일", start_time=request.POST['start_time_9'], end_time=request.POST['end_time_9'])
+                day.save()
+        else:
+            try:
+                day = EventDay.objects.get(event=event_id, date=9)
+                day.delete()
+            except EventDay.DoesNotExist:
+                pass
+
+        if 'day3' in request.POST:
+            try:
+                day = EventDay.objects.get(event=event_id,date=10)
+                if day:
+                    day.start_time=request.POST['start_time_10']
+                    day.end_time=request.POST['end_time_10']
+                    day.save()
+            except EventDay.DoesNotExist:
+                event=Event.objects.get(id=event_id)
+                day = EventDay(event=event,date=10,day="금요일", start_time=request.POST['start_time_10'], end_time=request.POST['end_time_10'])
+                day.save()
+        else:
+            try:
+                day = EventDay.objects.get(event=event_id, date=10)
+                day.delete()
+            except EventDay.DoesNotExist:
+                pass
+            
+        messages.success(request, '등록이 완료되었습니다!')
+
+        return redirect('collects:event_list')
