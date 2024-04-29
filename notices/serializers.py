@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from booths.models import *
+from django.utils import timezone
 
 class NoticeSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
@@ -28,5 +29,6 @@ class EventDetailSerializer(serializers.ModelSerializer):
                 'description','contact','realtime']
 
     def get_updated_at(self, obj):
-        return obj.updated_at.strftime("%-m월 %-d일 %-H시 %-M분")
+        local_time = timezone.localtime(obj.updated_at)
+        return local_time.strftime("%#m월 %#d일 %#H시 %#M분")
     
