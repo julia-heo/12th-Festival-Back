@@ -89,8 +89,10 @@ class EventListView(views.APIView):
             events = Event.objects.all()
 
         serializer = self.serializer_class(events, many=True)
-
-        return Response({'message': 'TF 이벤트 목록 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
+        if events.exists():
+            return Response({'message': 'TF 이벤트 목록 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
+        else:
+            return Response({'message': '해당 요일에 이벤트가 없습니다.', 'data': serializer.data}, status=HTTP_404_NOT_FOUND)
     
 class EventDetailView(views.APIView):
     serializer_class = EventDetailSerializer
@@ -105,7 +107,7 @@ class EventDetailView(views.APIView):
         event = self.get_object(pk=pk)
         serializer = self.serializer_class(event)
         return Response({'message': 'TF 부스 상세 조회 성공', 'data': serializer.data})
-    '''
+    
     def patch(self, request, pk):
         event = self.get_object(pk)
         serializer = EventDetailSerializer(instance=event, data=request.data, partial=True)
@@ -151,4 +153,3 @@ class EventDetailView(views.APIView):
         }
         return date_day_mapping.get(date)
 
-'''
