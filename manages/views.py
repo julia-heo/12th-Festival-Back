@@ -128,6 +128,62 @@ class BoothDetailView(views.APIView):
 
     def patch(self, request, pk):
         booth = self.get_object(pk)
+        request_data = request.data.copy()  # request.data의 복사본 생성
+        serializer = BoothDetailSerializer(instance=booth, data=request_data, partial=True)
+
+        if 'thumnail' in request_data:
+            file = request.FILES['thumnail']
+            folder = f"{pk}_images"  
+            file_url = FileUpload(s3_client).upload(file, folder)
+            request_data['thumnail'] = file_url
+        else:
+            # 이미지가 비어 있는 경우 기본 이미지로 설정
+            request_data['thumnail'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
+
+        if serializer.is_valid():
+            serializer.save()
+
+            request_days = request_data.get('days', [])
+            existing_days = booth.days.all()
+
+            for request_day in request_days:
+                date = request_day.get('date')
+                existing_day = existing_days.filter(date=date).first()
+
+                if existing_day:
+                    existing_day.start_time = request_day.get('start_time')
+                    existing_day.end_time = request_day.get('end_time')
+                    existing_day.save()
+                else:
+                    day_of_week = self.get_day_from_date(date) 
+                    booth.days.create(
+                        date=date,
+                        day=day_of_week,
+                        start_time=request_day.get('start_time'),
+                        end_time=request_day.get('end_time')
+                    )
+
+            return Response({'message': '부스 정보 및 날짜 수정 성공', 'data': serializer.data}, status=HTTP_200_OK)
+        else:
+            return Response({'message': '부스 정보 및 날짜 수정 실패', 'errors': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+
+    def get_day_from_date(self, date):
+        date_day_mapping = {
+            8: '수요일',
+            9: '목요일',
+            10: '금요일'
+        }
+        return date_day_mapping.get(date)
+
+
+
+
+
+
+
+'''
+    def patch(self, request, pk):
+        booth = self.get_object(pk)
         serializer = BoothDetailSerializer(instance=booth, data=request.data, partial=True)
 
         if 'thumnail' in request.data:
@@ -170,3 +226,4 @@ class BoothDetailView(views.APIView):
             10: '금요일'
         }
         return date_day_mapping.get(date)
+'''
