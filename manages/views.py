@@ -128,7 +128,7 @@ class BoothDetailView(views.APIView):
 
     def patch(self, request, pk):
         booth = self.get_object(pk)
-        request_data = request.data.copy()  # request.data의 복사본 생성
+        request_data = request.data.copy() 
         serializer = BoothDetailSerializer(instance=booth, data=request_data, partial=True)
 
         if 'thumnail' in request_data:
@@ -137,7 +137,6 @@ class BoothDetailView(views.APIView):
             file_url = FileUpload(s3_client).upload(file, folder)
             request_data['thumnail'] = file_url
         else:
-            # 이미지가 비어 있는 경우 기본 이미지로 설정
             request_data['thumnail'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
 
         if serializer.is_valid():
@@ -174,11 +173,6 @@ class BoothDetailView(views.APIView):
             10: '금요일'
         }
         return date_day_mapping.get(date)
-
-
-
-
-
 
 
 '''
