@@ -125,18 +125,23 @@ class EventDetailView(views.APIView):
     
     def patch(self, request, pk):
         event = self.get_object(pk)
-        serializer = EventDetailSerializer(instance=event, data=request.data, partial=True)
+        request_data = request.data.copy() 
+        serializer = EventDetailSerializer(instance=event, data=request_data, partial=True)
 
-        if 'thumnail' in request.data:
-            thumnail_file = request.FILES['thumnail']
-            folder = f"{pk}_images"  
+        if 'thumnail' in request_data:
+            file = request.FILES['thumnail']
+            folder = f"{pk}_images"   
+            file_url = FileUpload(s3_client).upload(file, folder)
+            request_data['thumnail'] = file_url
+        else:
+            request_data['thumnail'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
 
-            img = Image.open(thumnail_file)
-            temp = io.BytesIO()
-            img.save(temp, format='JPEG', quality=40)
-            temp.seek(0)
-            compressed_image_url = FileUpload(s3_client).upload(temp, folder)
-            request.data['thumnail'] = compressed_image_url
+            #img = Image.open(thumnail_file)
+            #temp = io.BytesIO()
+            #img.save(temp, format='JPEG', quality=40)
+            #temp.seek(0)
+            #compressed_image_url = FileUpload(s3_client).upload(temp, folder)
+            #request.data['thumnail'] = compressed_image_url
 
         if serializer.is_valid():
             serializer.save()
