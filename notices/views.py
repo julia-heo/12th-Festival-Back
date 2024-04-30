@@ -10,6 +10,13 @@ from .serializers import *
 from rest_framework.pagination import PageNumberPagination
 from .pagination import PaginationHandlerMixin
 from .permissions import IsTFOrReadOnly
+from PIL import Image
+from django.core.files.base import ContentFile
+import io
+from django.core.files import File
+import os
+import tempfile
+import boto3
 
 class TFPagination(PageNumberPagination):
     page_size = 5
@@ -82,18 +89,26 @@ class EventListView(views.APIView):
     permission_classes = [IsTFOrReadOnly]
     
     def get(self, request):
-        day = request.query_params.get('day')
-        if day:
-            events = Event.objects.filter(days__day=day)
-        else:
-            events = Event.objects.all()
-
-        serializer = self.serializer_class(events, many=True)
-        if events.exists():
-            return Response({'message': 'TF 이벤트 목록 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
-        else:
-            return Response({'message': '해당 요일에 이벤트가 없습니다.', 'data': serializer.data}, status=HTTP_404_NOT_FOUND)
+        event_type = request.query_params.get('type')
+        if event_type not in ['1', '2', '3']:
+            return Response({'message': '올바르지 않은 이벤트 타입입니다.'}, status=400)
+        if event_type == '1':
+            events = Event.objects.filter(type='기획부스')
+            message = "기획부스 이벤트 목록입니다."
+        elif event_type == '2':
+            events = Event.objects.filter(type='권리팀부스')
+            message = "권리팀부스 이벤트 목록입니다."
+        elif event_type == '3':
+            events = Event.objects.filter(type='대외협력팀부스')
+            message = "대외협력팀부스 이벤트 목록입니다."
+        serializer = EventListSerializer(events, many=True)
     
+        response_data = {
+            'message': message,
+            'events': serializer.data
+        }
+        return Response(response_data)
+
 class EventDetailView(views.APIView):
     serializer_class = EventDetailSerializer
     permission_classes = [IsTFOrReadOnly]
@@ -113,10 +128,15 @@ class EventDetailView(views.APIView):
         serializer = EventDetailSerializer(instance=event, data=request.data, partial=True)
 
         if 'thumnail' in request.data:
-            file = request.FILES['thumnail']
+            thumnail_file = request.FILES['thumnail']
             folder = f"{pk}_images"  
-            file_url = FileUpload(s3_client).upload(file, folder)
-            request.data['thumnail'] = file_url
+
+            img = Image.open(thumnail_file)
+            temp = io.BytesIO()
+            img.save(temp, format='JPEG', quality=40)
+            temp.seek(0)
+            compressed_image_url = FileUpload(s3_client).upload(temp, folder)
+            request.data['thumnail'] = compressed_image_url
 
         if serializer.is_valid():
             serializer.save()

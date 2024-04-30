@@ -18,14 +18,14 @@ class DaySerializer(serializers.ModelSerializer):
 class EventListSerializer(serializers.ModelSerializer):
     class Meta:
         model=Event
-        fields = ['user','name','place', 'summary', 'thumnail']
+        fields = ['user','name','place', 'type', 'thumnail']
     
 class EventDetailSerializer(serializers.ModelSerializer):
     days = DaySerializer(many=True, read_only=True)
     updated_at = serializers.SerializerMethodField()
     class Meta:
         model=Event
-        fields = ['user','name', 'place', 'summary', 'thumnail', 'updated_at','days','opened',
+        fields = ['user','name', 'place','thumnail', 'updated_at','days','opened',
                 'description','contact','realtime']
 
     def get_updated_at(self, obj):
