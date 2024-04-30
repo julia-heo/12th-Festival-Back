@@ -123,7 +123,6 @@ class EventDetailView(views.APIView):
         serializer = self.serializer_class(event)
         return Response({'message': 'TF 부스 상세 조회 성공', 'data': serializer.data})
     
-
     def patch(self, request, pk):
         event = self.get_object(pk)
         serializer = EventDetailSerializer(instance=event, data=request.data, partial=True)
