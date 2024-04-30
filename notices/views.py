@@ -10,7 +10,7 @@ from .serializers import *
 from rest_framework.pagination import PageNumberPagination
 from .pagination import PaginationHandlerMixin
 from .permissions import IsTFOrReadOnly
-from PIL import Image
+#from PIL import Image
 from django.core.files.base import ContentFile
 import io
 from django.core.files import File
