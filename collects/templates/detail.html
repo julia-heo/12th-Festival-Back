@@ -164,12 +164,14 @@
     <h3>카테고리: </h3>
     <p>(대동제 홈페이지에서 실시간 변경불가, 카테고리 항목 추가 요청있다면 멋사로)<br>
         [부스] ‘음식’ 또는 ‘굿즈’ 또는 ‘체험’ 또는 ‘기타’ 中 택 1<br>
-        [공연] ‘밴드’ 또는 ‘댄스’ 또는 ‘기타’ 中 택 1<br>
+        [공연] ‘밴드’ 또는 ‘댄스’ 또는 ‘노래’ 또는 ‘연주’ 또는 ‘기타’ 中 택 1<br>
         프로모션은 ‘기타’ 카테고리에 포함됩니다.<br>
         {% if booth.performance %}
         <select name="category">
             <option value="밴드" {% if booth.category == '밴드' %} selected {% endif %}>밴드</option>
             <option value="댄스" {% if booth.category == '댄스' %} selected {% endif %}>댄스</option>
+            <option value="노래" {% if booth.category == '노래' %} selected {% endif %}>노래</option>
+            <option value="연주" {% if booth.category == '연주' %} selected {% endif %}>연주</option>
             <option value="기타" {% if booth.category == '기타' %} selected {% endif %}>기타</option>
         </select>
         {% else %}
