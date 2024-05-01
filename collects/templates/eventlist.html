@@ -83,7 +83,7 @@
 {% for event in events %}
 <div class="event" onclick="window.location='{% url 'collects:event_detail' event.id %}'">
     <h2>{{ event.name }}</h2>
-    <p><strong>요약:</strong> {{ event.summary }}</p>
+    <p><strong>부스:</strong> {{ event.type }}</p>
 </div>
 {% endfor %}
 

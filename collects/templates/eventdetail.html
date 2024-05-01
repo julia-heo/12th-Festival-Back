@@ -108,17 +108,29 @@
     <p> 
         &nbsp;&nbsp;<input type="text" name="name" value="{{ event.name }}" maxlength="14" style="width: 250" placeholder="부스명을 입력해주세요 (최대 14자)" oninput="checkLength()">
     </p>
+    
+
+    <h3>부스 타입</h3>
+    어떤 부스인지 선택해주세요<br>
+    나중에 실시간으로 변경 불가능합니다!!!
+
+    <p>(대동제 홈페이지에서 실시간 변경불가, 카테고리 항목 추가 요청있다면 멋사로)<br>
+        ‘기획부스’ 또는 ‘권리팀부스’ 또는 ‘대외협력팀부스’ 中 택 1<br>
+        <select name="type">
+            <option value="기획부스" {% if booth.category == '기획부스' %} selected {% endif %}>기획부스</option>
+            <option value="권리팀부스" {% if booth.category == '권리팀부스' %} selected {% endif %}>권리팀부스</option>
+            <option value="대외협력팀부스" {% if booth.category == '대외협력팀부스' %} selected {% endif %}>대외협력팀부스</option></select>
+            </p>
+
     <h3>장소</h3>
     나중에 실시간으로 변경 불가능합니다!!!
     <p>
         &nbsp;&nbsp;<input type="text" name="place" value="{{ event.place }}" style="width: 250" placeholder="부스 위치를 입력해주세요">
     </p>
-    <h3>요약</h3>
-    리스트 목록에 보이는 한마디<br>
-    나중에 실시간으로 변경 불가능합니다!!!
-    <p>
-        &nbsp;&nbsp;<input type="text" name="summary" value="{{ event.summary }}" style="width: 250" placeholder="부스 요약 정보를 입력해주세요">
-    </p>
+    
+
+
+
     <h3>소개글</h3>
     [텍스트] 상세 설명, 글자수 제한 100 / 문자 조건 없음(이모티콘 가능)
     <p>

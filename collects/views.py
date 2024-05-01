@@ -228,7 +228,7 @@ def event_update_view(request,event_id):
         event=Event.objects.get(pk=event_id)
         event.name=request.POST['name']
         event.place=request.POST['place']
-        event.summary=request.POST['summary']
+        event.type=request.POST['type']
         event.updated_at=timezone.now()
         event.description=request.POST['description']
         event.contact=request.POST['contact']
@@ -313,7 +313,7 @@ def event_add_view(request):
         event=Event(
             name=request.POST['name'],
             place=request.POST['place'],
-            summary=request.POST['summary'],
+            type=request.POST['type'],
             updated_at=timezone.now(),
             description=request.POST['description'],
             contact=request.POST['contact'],
