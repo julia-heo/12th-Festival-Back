@@ -14,7 +14,36 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages, auth
+from PIL import Image as pil
+import os
 
+def rescale(image, width):
+    # 이미지 크기 조절
+    img = pil.open(image)
+    src_width, src_height = img.size
+    src_ratio = float(src_height) / float(src_width)
+    dst_height = round(src_ratio * width)
+
+    size=width, dst_height
+    img.thumbnail(size, pil.LANCZOS)
+    img = img.convert("RGB")
+    filename=str(image)
+    resultPath="./collects/tempfiles"
+    temp_file_path=os.path.join(resultPath, filename)
+    img.save(temp_file_path)
+
+    size_kb = os.path.getsize(temp_file_path) / 1024
+    print(size_kb)
+    while os.path.getsize(temp_file_path) / 1024 > 500:
+        width/=2
+        dst_height/=2
+        size=width, dst_height
+        img.thumbnail(size, pil.LANCZOS)
+        img = img.convert("RGB")
+        img.save(temp_file_path)
+        size_kb = os.path.getsize(temp_file_path) / 1024
+        print(size_kb)
+    return temp_file_path,filename
 
 def login_view(request):
     if request.method == 'POST':
@@ -71,9 +100,13 @@ def update_view(request,booth_id):
     
     file = request.FILES.get('image')
     if file:
-        folder = f"{booth_id}_images"  
-        file_url = FileUpload(s3_client).upload(file, folder)
-        booth_update.thumnail=file_url
+        temp_file_path,name = rescale(file,700)
+        folder = f"{booth_id}_images"
+        
+        file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+        booth_update.thumnail = file_url
+
+        os.remove(temp_file_path)
 
     booth_update.save()
 
@@ -165,9 +198,12 @@ def update_menu_view(request,menu_id):
         menu_update.vegan = request.POST['vegan']
         file = request.FILES.get('menuimg')
         if file:
-            folder = f"{booth_id}_images"  
-            file_url = FileUpload(s3_client).upload(file, folder)
-            menu_update.img=file_url
+            temp_file_path,name = rescale(file,700)
+            folder = f"{booth_id}_images"
+            
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+            menu_update.img = file_url
+
 
         menu_update.save()
         return redirect('collects:detail')
@@ -190,9 +226,14 @@ def create_menu_view(request,booth_id):
         )
         file = request.FILES.get('menuimg')
         if file:
-            folder = f"{booth_id}_images"  
-            file_url = FileUpload(s3_client).upload(file, folder)
-            menu.img=file_url
+            temp_file_path,name = rescale(file,700)
+            folder = f"{booth_id}_images"
+            
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+            menu.img=file_url = file_url
+
+            os.remove(temp_file_path)
+
         menu.save()
         return redirect('collects:detail')
     
@@ -236,9 +277,13 @@ def event_update_view(request,event_id):
         
         file = request.FILES.get('image')
         if file:
+            temp_file_path,name = rescale(file,700)
             folder = f"event_images"  
-            file_url = FileUpload(s3_client).upload(file, folder)
+            
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
             event.thumnail=file_url
+
+            os.remove(temp_file_path)
 
         event.save()
         if 'day1' in request.POST:
@@ -322,9 +367,13 @@ def event_add_view(request):
         )
         file = request.FILES.get('image')
         if file:
+            temp_file_path,name = rescale(file,700)
             folder = f"event_images"  
-            file_url = FileUpload(s3_client).upload(file, folder)
+            
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
             event.thumnail=file_url
+
+            os.remove(temp_file_path)
 
         event.save()
         event_id=event.id
