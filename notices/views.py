@@ -17,6 +17,36 @@ from django.core.files import File
 import os
 import tempfile
 import boto3
+from PIL import Image as pil
+import os
+
+def rescale(image, width):
+    # 이미지 크기 조절
+    img = pil.open(image)
+    src_width, src_height = img.size
+    src_ratio = float(src_height) / float(src_width)
+    dst_height = round(src_ratio * width)
+
+    size=width, dst_height
+    img.thumbnail(size, pil.LANCZOS)
+    img = img.convert("RGB")
+    filename=str(image)
+    resultPath="./collects/tempfiles"
+    temp_file_path=os.path.join(resultPath, filename)
+    img.save(temp_file_path)
+
+    size_kb = os.path.getsize(temp_file_path) / 1024
+    print(size_kb)
+    while os.path.getsize(temp_file_path) / 1024 > 500:
+        width/=2
+        dst_height/=2
+        size=width, dst_height
+        img.thumbnail(size, pil.LANCZOS)
+        img = img.convert("RGB")
+        img.save(temp_file_path)
+        size_kb = os.path.getsize(temp_file_path) / 1024
+        print(size_kb)
+    return temp_file_path,filename
 
 class TFPagination(PageNumberPagination):
     page_size = 5
@@ -131,8 +161,10 @@ class EventDetailView(views.APIView):
         if 'thumnail' in request_data:
             file = request.FILES['thumnail']
             folder = f"{pk}_images"   
-            file_url = FileUpload(s3_client).upload(file, folder)
+            temp_file_path,name = rescale(file,700)
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
             request_data['thumnail'] = file_url
+            os.remove(temp_file_path)
         else:
             request_data['thumnail'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
 
