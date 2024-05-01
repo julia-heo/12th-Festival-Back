@@ -7,3 +7,5 @@ class Notice(TimeStamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.TextField()
     content = models.TextField()
+
+    

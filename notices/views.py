@@ -4,10 +4,19 @@ from rest_framework import views
 from rest_framework.status import *
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import *
+from booths.models import * 
+from manages.storages import FileUpload, s3_client
 from .serializers import *
 from rest_framework.pagination import PageNumberPagination
 from .pagination import PaginationHandlerMixin
 from .permissions import IsTFOrReadOnly
+#from PIL import Image
+from django.core.files.base import ContentFile
+import io
+from django.core.files import File
+import os
+import tempfile
+import boto3
 
 class TFPagination(PageNumberPagination):
     page_size = 5
@@ -73,4 +82,99 @@ class NoticeDetailView(views.APIView):
         notice.delete()
 
         return Response({'message': 'TF 공지 삭제 성공'}, status=HTTP_204_NO_CONTENT)
+
+
+class EventListView(views.APIView):
+    serializer_class = EventListSerializer
+    permission_classes = [IsTFOrReadOnly]
     
+    def get(self, request):
+        event_type = request.query_params.get('type')
+        if event_type not in ['1', '2', '3']:
+            return Response({'message': '올바르지 않은 이벤트 타입입니다.'}, status=400)
+        if event_type == '1':
+            events = Event.objects.filter(type='기획부스')
+            message = "기획부스 이벤트 목록입니다."
+        elif event_type == '2':
+            events = Event.objects.filter(type='권리팀부스')
+            message = "권리팀부스 이벤트 목록입니다."
+        elif event_type == '3':
+            events = Event.objects.filter(type='대외협력팀부스')
+            message = "대외협력팀부스 이벤트 목록입니다."
+        serializer = EventListSerializer(events, many=True)
+    
+        response_data = {
+            'message': message,
+            'events': serializer.data
+        }
+        return Response(response_data)
+
+class EventDetailView(views.APIView):
+    serializer_class = EventDetailSerializer
+    permission_classes = [IsTFOrReadOnly]
+    def get_object(self, pk):
+        event = get_object_or_404(Event, pk=pk)
+        self.check_object_permissions(self.request, event)
+
+        return event
+
+    def get(self, request, pk):
+        event = self.get_object(pk=pk)
+        serializer = self.serializer_class(event)
+        return Response({'message': 'TF 부스 상세 조회 성공', 'data': serializer.data})
+    
+    def patch(self, request, pk):
+        event = self.get_object(pk)
+        request_data = request.data.copy() 
+        serializer = EventDetailSerializer(instance=event, data=request_data, partial=True)
+
+        if 'thumnail' in request_data:
+            file = request.FILES['thumnail']
+            folder = f"{pk}_images"   
+            file_url = FileUpload(s3_client).upload(file, folder)
+            request_data['thumnail'] = file_url
+        else:
+            request_data['thumnail'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
+
+            #img = Image.open(thumnail_file)
+            #temp = io.BytesIO()
+            #img.save(temp, format='JPEG', quality=40)
+            #temp.seek(0)
+            #compressed_image_url = FileUpload(s3_client).upload(temp, folder)
+            #request.data['thumnail'] = compressed_image_url
+
+        if serializer.is_valid():
+            serializer.save()
+
+            request_days = request.data.get('days', [])
+            existing_days = event.days.all()
+
+            for request_day in request_days:
+                date = request_day.get('date')
+                existing_day = existing_days.filter(date=date).first()
+
+                if existing_day:
+                    existing_day.start_time = request_day.get('start_time')
+                    existing_day.end_time = request_day.get('end_time')
+                    existing_day.save()
+                else:
+                    day_of_week = self.get_day_from_date(date) 
+                    event.days.create(
+                        date=date,
+                        day=day_of_week,
+                        start_time=request_day.get('start_time'),
+                        end_time=request_day.get('end_time')
+                    )
+
+            return Response({'message': 'TF 부스 수정 성공', 'data': serializer.data}, status=HTTP_200_OK)
+        else:
+            return Response({'message': 'TF 부스 수정 실패', 'errors': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+
+    def get_day_from_date(self, date):
+        date_day_mapping = {
+            8: '수요일',
+            9: '목요일',
+            10: '금요일'
+        }
+        return date_day_mapping.get(date)
+

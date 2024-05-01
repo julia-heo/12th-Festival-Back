@@ -107,7 +107,7 @@ MIDDLEWARE = [
 
     
     # runserver시 주석 해제
-    # "allauth.account.middleware.AccountMiddleware",
+    #"allauth.account.middleware.AccountMiddleware",
 ]
 
 # cors 

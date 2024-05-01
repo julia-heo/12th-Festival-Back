@@ -86,11 +86,18 @@ class Comment(TimeStamp):
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, related_name='comments')
     content = models.TextField()
 
+
 class Event(TimeStamp):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    TYPE_CHOICES = (
+        ('기획부스', '기획부스'),
+        ('권리팀부스', '권리팀부스'),
+        ('대외협력팀부스', '대외협력팀부스')
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
     name = models.TextField()
     place=models.TextField()        #장소 필터링 + 넘버 없음
-    summary=models.TextField(null=True)      #리스트 목록에 보이는 한마디
+    type = models.CharField(choices=TYPE_CHOICES, max_length=8, null=True)
     thumnail = models.TextField(null=True, blank=True)
     opened = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
@@ -121,3 +128,4 @@ class EventDay(models.Model):
 
     def __str__(self):
         return f'{self.id}'
+    
