@@ -25,7 +25,7 @@ class EventDetailSerializer(serializers.ModelSerializer):
     updated_at = serializers.SerializerMethodField()
     class Meta:
         model=Event
-        fields = ['id','user','name', 'place','thumnail', 'opened','updated_at','days','opened',
+        fields = ['id','user','name', 'place','thumnail','updated_at','days','opened',
                 'description','contact','realtime']
 
     def get_updated_at(self, obj):
