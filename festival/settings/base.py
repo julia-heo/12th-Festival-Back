@@ -73,7 +73,8 @@ INSTALLED_APPS = [
     "accounts",
     "booths",
     "manages",
-    "notices"
+    "notices",
+    "collects"
     
 
 ]
