@@ -185,6 +185,9 @@ USE_TZ = True
 
 USE_L10N = False
 
+CSRF_TRUSTED_ORIGINS = ['https://*.liber-ewha.com','https://www.liber-ewha.com', 'http://127.0.0.1:8000/']
+
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
