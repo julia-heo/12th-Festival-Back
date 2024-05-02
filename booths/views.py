@@ -28,7 +28,13 @@ class CommentView(views.APIView):
             return Response({'message': '댓글 작성 성공', 'data': serializer.data}, status=HTTP_200_OK)
         else:
             return Response({'message': '댓글 작성 실패', 'data': serializer.errors}, status=HTTP_400_BAD_REQUEST)
-    
+        
+    def get(self, request, pk):
+        booth = get_object_or_404(Booth, pk=pk)
+        comments = Comment.objects.filter(booth=pk)
+        serializers = CommentSerializer(comments,many=True,context={'user': request.user.id})
+        return Response({'message': '부스 댓글 조회 성공', 'data': serializers.data}, status=HTTP_200_OK)
+
 
 class CommentDetailView(views.APIView): 
     permission_classes = [IsAuthorOrReadOnly]
