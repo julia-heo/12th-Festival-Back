@@ -162,26 +162,12 @@
     </p>
     
     <h3>카테고리: </h3>
-    <p>(대동제 홈페이지에서 실시간 변경불가, 카테고리 항목 추가 요청있다면 멋사로)<br>
-        [부스] ‘음식’ 또는 ‘굿즈’ 또는 ‘체험’ 또는 ‘기타’ 中 택 1<br>
-        [공연] ‘밴드’ 또는 ‘댄스’ 또는 ‘노래’ 또는 ‘연주’ 또는 ‘기타’ 中 택 1<br>
+        [부스] ‘음식’ 또는 ‘굿즈’ 또는 ‘체험’ 또는 ‘기타’ 中 최대 2개<br>
+        [공연] ‘밴드’ 또는 ‘댄스’ 또는 ‘노래’ 또는 ‘연주’ 또는 ‘기타’ 中 최대 2개<br>
         프로모션은 ‘기타’ 카테고리에 포함됩니다.<br>
-        {% if booth.performance %}
-        <select name="category">
-            <option value="밴드" {% if booth.category == '밴드' %} selected {% endif %}>밴드</option>
-            <option value="댄스" {% if booth.category == '댄스' %} selected {% endif %}>댄스</option>
-            <option value="노래" {% if booth.category == '노래' %} selected {% endif %}>노래</option>
-            <option value="연주" {% if booth.category == '연주' %} selected {% endif %}>연주</option>
-            <option value="기타" {% if booth.category == '기타' %} selected {% endif %}>기타</option>
-        </select>
-        {% else %}
-        <select name="category">
-            <option value="굿즈" {% if booth.category == '굿즈' %} selected {% endif %}>굿즈</option>
-            <option value="음식" {% if booth.category == '음식' %} selected {% endif %}>음식</option>
-            <option value="체험" {% if booth.category == '체험' %} selected {% endif %}>체험</option>
-            <option value="기타" {% if booth.category == '기타' %} selected {% endif %}>기타</option>
-        </select>
-        {% endif %}
+        두개 선택 시 띄어쓰기로 구분해 입력해주세요 (ex. "음식 굿즈" "체험 굿즈")<br>
+        &nbsp;&nbsp;<input type="text" name="category" maxlength="5" style="width: 150;" value="{{ booth.category }}" oninput="checkLength()">
+        
     </p>
     <h3>운영 시간:</h3>
     <p> (예: 9:00 ~ 14:00)<br> 
@@ -334,6 +320,26 @@
             alert("시작 시간과 종료 시간을 입력해주세요!");
             return false;
         }
+
+        {% if booth.performance %}
+            var validCategories = ['밴드', '댄스', '노래', '연주', '기타'];
+        {% else %}
+            var validCategories = ['음식', '굿즈', '체험', '기타'];
+        {% endif %}
+
+        var category = document.getElementsByName("category")[0].value;
+        var categories = category.split(" ");
+        for (var i = 0; i < categories.length; i++) {
+            if (!validCategories.includes(categories[i])) {
+                alert("카테고리 양식을 지켜주세요!");
+                return false;
+            }
+        }
+        if(categories.length==2&&categories[0]==categories[1]){
+            alert("서로 다른 카테고리를 선택해주세요!");
+            return false;
+        }
+
         return true;
     }
 
