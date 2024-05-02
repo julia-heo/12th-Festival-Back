@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import User
+from django.utils import timezone
 
 class TimeStamp(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -7,6 +8,11 @@ class TimeStamp(models.Model):
 
     class Meta:
         abstract = True
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.created_at = timezone.localtime()
+        self.updated_at = timezone.localtime()
+        super().save(*args, **kwargs)
     
 class Booth(TimeStamp):
     COLLEGE_CHOICES = (
