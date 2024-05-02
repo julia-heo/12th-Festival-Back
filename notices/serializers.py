@@ -16,9 +16,19 @@ class DaySerializer(serializers.ModelSerializer):
         fields = ['id', 'day', 'date', 'start_time', 'end_time']
 
 class EventListSerializer(serializers.ModelSerializer):
+    time = serializers.SerializerMethodField()
     class Meta:
         model=Event
-        fields = ['id','user','name','place', 'opened','type', 'thumnail']
+        fields = ['id','user','name','place', 'opened','type', 'thumnail','time']
+    def get_time(self, obj):
+        day=EventDay.objects.filter(event=obj).first()
+        if day:
+            start=day.start_time
+            end=day.end_time
+            return start+" - "+end
+        else:
+            return ""
+            
     
 class EventDetailSerializer(serializers.ModelSerializer):
     days = DaySerializer(many=True, read_only=True)
