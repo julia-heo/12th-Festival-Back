@@ -50,7 +50,7 @@ class CommentDetailView(views.APIView):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response({'message': '댓글 수정 성공', 'data': serializer.data},status=HTTP_204_NO_CONTENT)
+            return Response({'message': '댓글 수정 성공', 'data': serializer.data},status=HTTP_200_OK)
         else:
             return Response({'message': '댓글 수정 실패', 'data': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
