@@ -181,7 +181,7 @@ LANGUAGE_CODE = 'ko-KR'
 
 TIME_ZONE = 'Asia/Seoul'
 
-USE_TZ = True
+USE_TZ = False
 
 USE_L10N = False
 
