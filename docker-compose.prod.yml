@@ -30,6 +30,8 @@ services:
       - "80:80"
     depends_on:
       - web
+    environment:
+      TZ: "Asia/Seoul"
 
 volumes:
   static:
