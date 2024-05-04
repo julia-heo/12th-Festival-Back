@@ -19,6 +19,7 @@ import tempfile
 import boto3
 from PIL import Image as pil
 import os
+import json
 
 def rescale(image, width):
     # 이미지 크기 조절
@@ -182,6 +183,7 @@ class EventDetailView(views.APIView):
             serializer.save()
 
             request_days = request.data.get('days', [])
+            request_days = json.loads(request_days)
             existing_days = event.days.all()
 
             for request_day in request_days:
