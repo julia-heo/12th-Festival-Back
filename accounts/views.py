@@ -40,7 +40,7 @@ class LoginView(views.APIView):
         return Response({'message': "로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
     
 class DuplicateUsernameView(views.APIView):
-    def get(self, request):
+    def post(self, request):
         return Response({'message': "아이디 중복 확인 성공","data":{"duplicate":User.objects.filter(username=request.data['username']).exists()}}, status=HTTP_200_OK)
 
 class KakaoLoginView(views.APIView):
