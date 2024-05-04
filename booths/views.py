@@ -48,7 +48,7 @@ class CommentDetailView(views.APIView):
         comment = self.get_object(pk=comment_pk)
         comment.delete()
         
-        return Response({'message': '댓글 삭제 성공'}, status=HTTP_204_NO_CONTENT)
+        return Response({'message': '댓글 삭제 성공'}, status=HTTP_200_OK)
     
     def patch(self, request,comment_pk):
         comment = self.get_object(pk=comment_pk)
@@ -128,7 +128,7 @@ class SearchView(views.APIView,PaginationHandlerMixin):
         booths = self.paginate_queryset(booths)
         serializer = self.serializer_class(booths, many=True)
 
-        return Response({'message':'검색 성공', "page": page, 'total': total, 'total_page': total_page,"view": len(booths), 'data': serializer.data}, status=HTTP_200_OK)
+        return Response({'message':'검색 성공', "page": int(page), 'total': total, 'total_page': total_page,"view": len(booths), 'data': serializer.data}, status=HTTP_200_OK)
     
     
 class BoothDetailView(views.APIView):
@@ -185,7 +185,7 @@ class BoothListView(views.APIView,PaginationHandlerMixin):
 
 
 
-        return Response({'message': "부스 목록 조회 성공","page":page, 'total': total, 
+        return Response({'message': "부스 목록 조회 성공","page":(int)(page), 'total': total, 
                         'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
     
 

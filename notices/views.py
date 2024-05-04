@@ -68,9 +68,9 @@ class NoticeListView(views.APIView):
             total_pages = paginator.page.paginator.num_pages
             view_count = len(serializer.data)
 
-            return Response({'message': 'TF 공지 조회 성공','page': page_number,'total': total_items,'total_page': total_pages,'view': view_count,'data': serializer.data}, status=HTTP_200_OK)
+            return Response({'message': 'TF 공지 조회 성공','page': (int)(page_number),'total': total_items,'total_page': total_pages,'view': view_count,'data': serializer.data}, status=HTTP_200_OK)
         else: 
-            return Response({'message': 'TF 공지 없음','page': page_number,'total': Notice.objects.count(),'total_page': paginator.page.paginator.num_pages,'view': 0,'data': serializer.data}, status=HTTP_200_OK)
+            return Response({'message': 'TF 공지 없음','page': (int)(page_number),'total': Notice.objects.count(),'total_page': paginator.page.paginator.num_pages,'view': 0,'data': serializer.data}, status=HTTP_200_OK)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -111,7 +111,7 @@ class NoticeDetailView(views.APIView):
         notice = self.get_object(pk=pk)
         notice.delete()
 
-        return Response({'message': 'TF 공지 삭제 성공'}, status=HTTP_204_NO_CONTENT)
+        return Response({'message': 'TF 공지 삭제 성공'}, status=HTTP_200_OK)
 
 
 class EventListView(views.APIView):

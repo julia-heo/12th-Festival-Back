@@ -140,11 +140,11 @@ class LikesView(views.APIView, PaginationHandlerMixin):
                 booth.is_liked=True
             total = len(booths)
             if (total==0):
-                return Response({'message': "스크랩한 공연이 없습니다","page":page, 'total': 0, 'total_page': 0,"view": 0,'data': None}, status=HTTP_200_OK)
+                return Response({'message': "스크랩한 공연이 없습니다","page":(int)(page), 'total': 0, 'total_page': 0,"view": 0,'data': None}, status=HTTP_200_OK)
             total_page = math.ceil(total/10)
             booths = self.paginate_queryset(booths)
             serializers = LikeBoothSerializer(booths,many=True)
-            return Response({'message': "스크랩한 부스 목록 조회 성공","page":page, 'total': total, 'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
+            return Response({'message': "스크랩한 부스 목록 조회 성공","page":(int)(page), 'total': total, 'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
 
         elif(type=="메뉴"):
             menus = Menu.objects.filter(like=user.id)
@@ -152,11 +152,11 @@ class LikesView(views.APIView, PaginationHandlerMixin):
                 menu.is_liked=True
             total = len(menus)
             if (total==0):
-                return Response({'message': "스크랩한 메뉴가 없습니다","page":page, 'total': 0, 'total_page': 0,"view": 0,'data': None}, status=HTTP_200_OK)
+                return Response({'message': "스크랩한 메뉴가 없습니다","page":(int)(page), 'total': 0, 'total_page': 0,"view": 0,'data': None}, status=HTTP_200_OK)
             total_page = math.ceil(total/10)
             menus = self.paginate_queryset(menus)
             serializers = LikeMenuSerializer(menus,many=True)
-            return Response({'message': "스크랩한 메뉴 목록 조회 성공","page":page, 'total': total, 'total_page': total_page,"view": len(menus),'data': serializers.data}, status=HTTP_200_OK)
+            return Response({'message': "스크랩한 메뉴 목록 조회 성공","page":(int)(page), 'total': total, 'total_page': total_page,"view": len(menus),'data': serializers.data}, status=HTTP_200_OK)
 
         elif(type=="공연"):
             booths = Booth.objects.filter(like=user.id,performance=True)
@@ -164,11 +164,11 @@ class LikesView(views.APIView, PaginationHandlerMixin):
                 booth.is_liked=True
             total = len(booths)
             if (total==0):
-                return Response({'message': "스크랩한 공연이 없습니다","page":page, 'total': 0, 'total_page': 0,"view": 0,'data': None}, status=HTTP_200_OK)
+                return Response({'message': "스크랩한 공연이 없습니다","page":(int)(page), 'total': 0, 'total_page': 0,"view": 0,'data': None}, status=HTTP_200_OK)
             total_page = math.ceil(total/10)
             booths = self.paginate_queryset(booths)
             serializers = LikeBoothSerializer(booths,many=True)
-            return Response({'message': "스크랩한 공연 목록 조회 성공","page":page, 'total': total, 'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
+            return Response({'message': "스크랩한 공연 목록 조회 성공","page":(int)(page), 'total': total, 'total_page': total_page,"view": len(booths),'data': serializers.data}, status=HTTP_200_OK)
         else:
             return Response({'message': "type을 입력해주세요"}, status=HTTP_400_BAD_REQUEST)
     
