@@ -98,7 +98,7 @@ class NoticeDetailView(views.APIView):
 
         return Response({'message': 'TF 공지 상세 조회 성공', 'data': serializer.data})
 
-    def put(self, request, pk):
+    def put(self, request, pk, format=None):
         notice = self.get_object(pk=pk)
         serializer = self.serializer_class(data=request.data, instance=notice)
 
@@ -153,21 +153,24 @@ class EventDetailView(views.APIView):
         serializer = self.serializer_class(event)
         return Response({'message': 'TF 부스 상세 조회 성공', 'data': serializer.data})
     
-    def patch(self, request, pk):
+    def patch(self, request, pk, format=None):
         event = self.get_object(pk)
         request_data = request.data.copy() 
-        serializer = EventDetailSerializer(instance=event, data=request_data, partial=True)
+        
 
         if 'thumnail' in request_data:
             file = request.FILES['thumnail']
             folder = f"{pk}_images"   
             temp_file_path,name = rescale(file,700)
-            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+            file_extension = name.split('.')[-1]
+
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "thumnail"+str(pk)+"."+file_extension)
             request_data['thumnail'] = file_url
             os.remove(temp_file_path)
         else:
-            request_data['thumnail'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
+            request_data['thumnail'] = ""
 
+        serializer = EventDetailSerializer(instance=event, data=request_data, partial=True)
             #img = Image.open(thumnail_file)
             #temp = io.BytesIO()
             #img.save(temp, format='JPEG', quality=40)

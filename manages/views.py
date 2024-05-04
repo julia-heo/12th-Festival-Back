@@ -48,43 +48,48 @@ class MenuView(views.APIView):
         serializer = self.serializer_class(menus, many=True)    
         return Response({'message': '메뉴 목록 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
 
-    def post(self, request, pk):
+    def post(self, request, pk, format=None):
         data = request.data.copy() # request.data 자체 불변성 --> copy해서 편집
         data['booth'] = pk
-        # serializer = MenuSerializer(data=data)
 
         if 'img' in data:
             if data['img'] == "":
-                file_url = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
+                file_url = ""
                 data.pop('img')
-
+                serializer = MenuSerializer(data=data)
+                if serializer.is_valid():
+                    seri = serializer.save()
+                    return Response({'message':'메뉴 등록 성공, 이미지 없음','data':serializer.data}, status=HTTP_201_CREATED)
+                else:
+                    return Response({'message': '메뉴 등록 실패, 이미지 없음', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
             else:
                 file = request.FILES.get('img')
+
                 data.pop('img')
-                folder = f"{pk}_images"  
-                temp_file_path,name = rescale(file,700)
+                serializer = MenuSerializer(data=data)
+                if serializer.is_valid():
+                    seri = serializer.save()
+                    menu_id = seri.id
 
-                file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
-                os.remove(temp_file_path)
+                    folder = f"{pk}_images"  
+                    temp_file_path,name = rescale(file,700)
+                    file_extension = name.split('.')[-1]
                 
-            serializer = MenuSerializer(data=data)
-            if serializer.is_valid():
+                    file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "menu"+str(menu_id)+"."+file_extension)
+                    os.remove(temp_file_path)
 
-                seri = serializer.save()   
-                seri.img = file_url
-                seri.save() 
-
-                return Response({'message': '메뉴 등록 성공, 메뉴 사진 등록', 'data': serializer.data}, status=HTTP_201_CREATED)
-            return Response({'message': '메뉴 등록 실패, 메뉴 사진 등록', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
-    
+                    seri.img = file_url
+                    seri.save()
+                    return Response({'message': '메뉴 등록 성공, 메뉴 사진 등록', 'data': serializer.data}, status=HTTP_201_CREATED)
+                else:
+                    return Response({'message': '메뉴 등록 실패, 메뉴 사진 등록', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
         else:
-            data['booth'] = pk
             # if 'img' not in data :
-            data['img'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
+            data['img'] = ""
             serializer = MenuSerializer(data=data)
             if serializer.is_valid():
                 seri = serializer.save()
-                return Response({'message':'메뉴 등록 성공, 기본 이미지','data':serializer.data}, status=HTTP_201_CREATED)
+                return Response({'message':'메뉴 등록 성공, 이미지 없음','data':serializer.data}, status=HTTP_201_CREATED)
 
 
 class MenuDetailView(views.APIView):
@@ -106,18 +111,21 @@ class MenuDetailView(views.APIView):
         menu.delete()
         return Response({'message': '메뉴 삭제 성공'}, status=HTTP_204_NO_CONTENT)
 
-    def patch(self, request, pk, menu_pk):
+    def patch(self, request, pk, menu_pk,format=None):
         menu = get_object_or_404(Menu, pk=menu_pk, booth=pk) 
-        serializer = MenuSerializer(instance=menu, data=request.data, partial=True)
-
+        data = request.data.copy()
         if 'img' in request.data:
             file = request.FILES['img']
             folder = f"{pk}_images"  
             temp_file_path,name = rescale(file,700)
-            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
-            request.data['img'] = file_url
+            file_extension = name.split('.')[-1]
+            
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "menu"+str(menu_pk)+"."+file_extension)
+
+            data['img'] = file_url
             os.remove(temp_file_path)
 
+        serializer = MenuSerializer(instance=menu, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({'message': '메뉴 수정 성공', 'data': serializer.data}, status=HTTP_200_OK)
@@ -159,20 +167,24 @@ class BoothDetailView(views.APIView):
         serializer = self.serializer_class(booth)
         return Response({'message': '부스 상세 조회 성공', 'data': serializer.data})
 
-    def patch(self, request, pk):
+    def patch(self, request, pk, format=None):
         booth = self.get_object(pk)
         request_data = request.data.copy() 
-        serializer = BoothDetailSerializer(instance=booth, data=request_data, partial=True)
+        
 
         if 'thumnail' in request_data:
             file = request.FILES['thumnail']
             folder = f"{pk}_images"  
             temp_file_path,name = rescale(file,700)
-            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+            file_extension = name.split('.')[-1]
+
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "thumnail."+file_extension)
             request_data['thumnail'] = file_url
             os.remove(temp_file_path)
         else:
-            request_data['thumnail'] = "https://festivalewha.s3.ap-northeast-2.amazonaws.com/menu_defalt.png"
+            request_data['thumnail'] = ""
+
+        serializer = BoothDetailSerializer(instance=booth, data=request_data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
