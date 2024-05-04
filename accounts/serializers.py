@@ -40,19 +40,28 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError('잘못된 비밀번호입니다.')
             else:
                 token = RefreshToken.for_user(user)
-                refresh = str(token)
+                token = RefreshToken.for_user(user)
                 access = str(token.access_token)
 
-                data = {
+                user_info = {
                     'id': user.id,
-                    'nickname': user.nickname ,
-                    'access_token': access
+                    'nickname': user.nickname,
+                    'tf': user.is_tf,
+                    'booth': user.is_booth,
+                }
+                if user.is_booth:
+                    user_booth = Booth.objects.filter(user=user).first()  
+                    if user_booth:
+                        user_info['performance'] = user_booth.performance
+
+                data = {
+                    'access_token': access,
+                    'user_info': user_info
                 }
 
                 return data
         else:
             raise serializers.ValidationError('존재하지 않는 사용자입니다.')
-
 
 class ProfileSerializer(serializers.ModelSerializer):
     booth_id = serializers.SerializerMethodField()
