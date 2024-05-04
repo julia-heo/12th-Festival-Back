@@ -170,7 +170,7 @@ class BoothListView(views.APIView):
         if day:
             booths = booths.filter(days__date=day)
         if college:
-            if college is not None:
+            if college is not "null":
                 booths = booths.filter(college=college)
         total = len(booths)
         total_page = math.ceil(total/10)
