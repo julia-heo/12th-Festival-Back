@@ -40,7 +40,7 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError('잘못된 비밀번호입니다.')
             else:
                 token = RefreshToken.for_user(user)
-                token = RefreshToken.for_user(user)
+                refresh = str(token)
                 access = str(token.access_token)
 
                 user_info = {
