@@ -103,7 +103,8 @@ def update_view(request,booth_id):
         temp_file_path,name = rescale(file,700)
         folder = f"{booth_id}_images"
         
-        file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+        file_extension = name.split('.')[-1]
+        file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "thumnail."+file_extension)
         booth_update.thumnail = file_url
 
         os.remove(temp_file_path)
@@ -200,9 +201,12 @@ def update_menu_view(request,menu_id):
         if file:
             temp_file_path,name = rescale(file,700)
             folder = f"{booth_id}_images"
+            file_extension = name.split('.')[-1]
             
-            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "menu"+str(menu_id)+"."+file_extension)
             menu_update.img = file_url
+
+            os.remove(temp_file_path)
 
 
         menu_update.save()
@@ -224,17 +228,20 @@ def create_menu_view(request,booth_id):
             price = request.POST['price'],
             vegan = request.POST['vegan']
         )
+        menu.save()
         file = request.FILES.get('menuimg')
         if file:
             temp_file_path,name = rescale(file,700)
             folder = f"{booth_id}_images"
+            file_extension = name.split('.')[-1]
             
-            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
-            menu.img=file_url = file_url
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "menu"+str(menu.id)+"."+file_extension)
+            menu.img=file_url 
 
             os.remove(temp_file_path)
+            menu.save()
 
-        menu.save()
+        
         return redirect('collects:detail')
     
 def event_list_view(request):
@@ -279,8 +286,9 @@ def event_update_view(request,event_id):
         if file:
             temp_file_path,name = rescale(file,700)
             folder = f"event_images"  
+            file_extension = name.split('.')[-1]
             
-            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "thumnail"+str(event_id)+"."+file_extension)
             event.thumnail=file_url
 
             os.remove(temp_file_path)
@@ -365,18 +373,20 @@ def event_add_view(request):
             realtime=request.POST['realtime'],
             user=User.objects.get(id=1)
         )
+        event.save()
+        event_id=event.id
         file = request.FILES.get('image')
         if file:
             temp_file_path,name = rescale(file,700)
             folder = f"event_images"  
+            file_extension = name.split('.')[-1]
+
+            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, "thumnail"+str(event_id)+"."+file_extension)
             
-            file_url = FileUpload(s3_client).upload(open(temp_file_path, 'rb'), folder, name)
             event.thumnail=file_url
 
             os.remove(temp_file_path)
-
-        event.save()
-        event_id=event.id
+            event.save()
         if 'day1' in request.POST:
             try:
                 day = EventDay.objects.get(event=event_id,date=8)

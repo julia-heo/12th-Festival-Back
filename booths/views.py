@@ -125,6 +125,7 @@ class SearchView(views.APIView,PaginationHandlerMixin):
                     booth.is_liked = True
         total = len(booths)
         total_page = math.ceil(total/10)
+        booths = self.paginate_queryset(booths)
         serializer = self.serializer_class(booths, many=True)
 
         return Response({'message':'검색 성공', "page": page, 'total': total, 'total_page': total_page,"view": len(booths), 'data': serializer.data}, status=HTTP_200_OK)
@@ -150,7 +151,7 @@ class BoothDetailView(views.APIView):
 
         return Response({'message': '부스 상세 조회 성공', 'data': serializer.data}, status=HTTP_200_OK)
     
-class BoothListView(views.APIView):
+class BoothListView(views.APIView,PaginationHandlerMixin):
     serializer_class = BoothListSerializer
     pagination_class = BoothPagination
 
@@ -172,8 +173,11 @@ class BoothListView(views.APIView):
         if college:
             if college != "null":
                 booths = booths.filter(college=college)
+        booths = booths.order_by("id")
         total = len(booths)
         total_page = math.ceil(total/10)
+        booths = self.paginate_queryset(booths)
+
         if request.user.is_authenticated:
             for booth in booths:
                 booth.is_liked = booth.like.filter(id=request.user.id).exists()
