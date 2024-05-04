@@ -109,7 +109,7 @@ class MenuDetailView(views.APIView):
     def delete(self, request, pk, menu_pk):
         menu = self.get_object(pk, menu_pk)
         menu.delete()
-        return Response({'message': '메뉴 삭제 성공'}, status=HTTP_204_NO_CONTENT)
+        return Response({'message': '메뉴 삭제 성공'}, status=HTTP_200_OK )
 
     def patch(self, request, pk, menu_pk,format=None):
         menu = get_object_or_404(Menu, pk=menu_pk, booth=pk) 
