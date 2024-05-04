@@ -9,6 +9,7 @@ from .permissions import IsAuthorOrReadOnly
 from .storages import FileUpload, s3_client
 from PIL import Image as pil
 import os
+import json
 
 def rescale(image, width):
     # 이미지 크기 조절
@@ -190,6 +191,7 @@ class BoothDetailView(views.APIView):
             serializer.save()
 
             request_days = request_data.get('days', [])
+            request_days = json.loads(request_days)
             existing_days = booth.days.all()
 
             for request_day in request_days:
