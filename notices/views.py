@@ -169,7 +169,7 @@ class EventDetailView(views.APIView):
             request_data['thumnail'] = file_url
             os.remove(temp_file_path)
         else:
-            request_data['thumnail'] = ""
+            request_data['thumnail'] = event.thumnail
 
         serializer = EventDetailSerializer(instance=event, data=request_data, partial=True)
             #img = Image.open(thumnail_file)
