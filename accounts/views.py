@@ -93,7 +93,7 @@ class KakaoCallbackView(views.APIView):
             # kakao계정 아이디가 이미 가입한거라면
             # 서비스에 rest-auth 로그인
             data={'username':KAKAO_USERNAME+social_id,'password':KAKAO_PASSWORD}
-            serializer = LoginSerializer(data=data)
+            serializer = KakaoLoginSerializer(data=data)
             if serializer.is_valid():
                 validated_data = serializer.validated_data
                 validated_data['exist'] = True
