@@ -125,6 +125,8 @@ class MenuDetailView(views.APIView):
 
             data['img'] = file_url
             os.remove(temp_file_path)
+        else:
+            data['img'] = menu.img
 
         serializer = MenuSerializer(instance=menu, data=data, partial=True)
         if serializer.is_valid():
@@ -183,7 +185,7 @@ class BoothDetailView(views.APIView):
             request_data['thumnail'] = file_url
             os.remove(temp_file_path)
         else:
-            request_data['thumnail'] = ""
+            request_data['thumnail'] = booth.thumnail
 
         serializer = BoothDetailSerializer(instance=booth, data=request_data, partial=True)
 
