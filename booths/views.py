@@ -168,7 +168,7 @@ class BoothListView(views.APIView,PaginationHandlerMixin):
                 booths = booths.filter(performance=True)
             else:
                 booths = booths.filter(performance=False)
-        if day:
+        if day in ["8", "9", "10"]:
             booths = booths.filter(days__date=day)
         if college:
             if college != "null":
