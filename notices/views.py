@@ -117,7 +117,7 @@ class NoticeDetailView(views.APIView):
 
 class EventListView(views.APIView):
     serializer_class = EventListSerializer
-    permission_classes = [IsTFOrReadOnly]
+
     
     def get(self, request):
         event_type = request.query_params.get('type')
