@@ -196,6 +196,10 @@ class BoothDetailView(views.APIView):
             request_days = json.loads(request_days)
             existing_days = booth.days.all()
 
+            for existing_day in existing_days:
+                if existing_day.date not in [day['date'] for day in request_days]:
+                    existing_day.delete()
+
             for request_day in request_days:
                 date = request_day.get('date')
                 existing_day = existing_days.filter(date=date).first()
