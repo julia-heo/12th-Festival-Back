@@ -9,7 +9,7 @@ class TimeStamp(models.Model):
     class Meta:
         abstract = True
     
-class Booth(TimeStamp):
+class Booth(models.Model):
     COLLEGE_CHOICES = (
         ('교육관', '교육관'),
         ('대강당', '대강당'),
@@ -35,7 +35,8 @@ class Booth(TimeStamp):
         ('연주', '연주'),
         ('기타', '기타'),
     )
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     college = models.CharField(choices=COLLEGE_CHOICES, max_length=20)
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=5)

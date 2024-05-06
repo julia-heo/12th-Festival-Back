@@ -19,4 +19,4 @@ class BoothDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Booth
-        fields = ['id', 'user', 'college', 'name', 'days', 'number', 'thumnail', 'opened', 'description', 'contact', 'realtime', 'performance']
+        fields = ['id', 'user', 'college', 'name', 'days', 'number', 'thumnail', 'opened', 'description', 'contact', 'realtime', 'performance', 'updated_at']

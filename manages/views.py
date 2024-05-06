@@ -174,7 +174,7 @@ class BoothDetailView(views.APIView):
     def patch(self, request, pk, format=None):
         booth = self.get_object(pk)
         request_data = request.data.copy() 
-        
+        request_data['updated_at']=timezone.now()
 
         if 'thumnail' in request_data:
             file = request.FILES['thumnail']
