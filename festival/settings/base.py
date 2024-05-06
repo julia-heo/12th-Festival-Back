@@ -122,7 +122,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://liber-ewha.com',
     'https://www.liber-ewha.com',
     'https://api.liber-ewha.com',
-    'https://12th-ewha-festival-front.vercel.app/'
+    'https://12th-ewha-festival-front.vercel.app'
 ]
 CORS_ALLOW_METHODS = ( 
     'DELETE',
@@ -196,7 +196,7 @@ USE_TZ = False
 
 USE_L10N = False
 
-CSRF_TRUSTED_ORIGINS = ['https://*.liber-ewha.com','https://www.liber-ewha.com', 'http://127.0.0.1:8000/','https://12th-ewha-festival-front.vercel.app/']
+CSRF_TRUSTED_ORIGINS = ['https://*.liber-ewha.com','https://www.liber-ewha.com', 'http://127.0.0.1:8000','https://12th-ewha-festival-front.vercel.app']
 
 
 

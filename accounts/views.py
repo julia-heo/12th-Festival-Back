@@ -10,6 +10,8 @@ import math
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from .pagination import PaginationHandlerMixin
+from rest_framework.decorators import api_view
+
 
 # # Create your views here.
 KAKAO_CLIENT_ID = getattr(festival.settings.base, 'KAKAO_CLIENT_ID')
@@ -174,5 +176,6 @@ class LikesView(views.APIView, PaginationHandlerMixin):
             return Response({'message': "type을 입력해주세요"}, status=HTTP_400_BAD_REQUEST)
     
 class HealthView(views.APIView):
+    @api_view(['GET','POST'])
     def health(request):
         return Response(status=HTTP_200_OK)
