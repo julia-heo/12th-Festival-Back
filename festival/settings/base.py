@@ -185,7 +185,7 @@ USE_TZ = False
 
 USE_L10N = False
 
-CSRF_TRUSTED_ORIGINS = ['https://*.liber-ewha.com','https://www.liber-ewha.com', 'http://127.0.0.1:8000/']
+CSRF_TRUSTED_ORIGINS = ['https://*.liber-ewha.com','https://www.liber-ewha.com', 'http://127.0.0.1:8000/','https://12th-ewha-festival-front.vercel.app/']
 
 
 
