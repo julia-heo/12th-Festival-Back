@@ -24,6 +24,7 @@ KAKAO_PROFILE_URI = "https://kapi.kakao.com/v2/user/me"
 
 
 class SignUpView(views.APIView):
+    authentication_classes = ()
     def post(self,request, format=None):
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
