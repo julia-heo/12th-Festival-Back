@@ -10,7 +10,6 @@ import math
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from .pagination import PaginationHandlerMixin
-from django.views.decorators.csrf import csrf_exempt
 
 # # Create your views here.
 KAKAO_CLIENT_ID = getattr(festival.settings.base, 'KAKAO_CLIENT_ID')
@@ -25,7 +24,6 @@ KAKAO_PROFILE_URI = "https://kapi.kakao.com/v2/user/me"
 
 
 class SignUpView(views.APIView):
-    @csrf_exempt
     def post(self,request, format=None):
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
