@@ -11,5 +11,6 @@ urlpatterns = [
         path('kakao/callback/',KakaoCallbackView.as_view()),
         path('kakao/nickname/', KakaoSignupView.as_view()),
         path('', ProfileView.as_view()),
-        path('likes/',LikesView.as_view())
+        path('likes/',LikesView.as_view()),
+        path('health/', HealthView.health)
 ]
