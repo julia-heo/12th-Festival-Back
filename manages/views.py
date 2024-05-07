@@ -52,6 +52,7 @@ class MenuView(views.APIView):
     def post(self, request, pk, format=None):
         data = request.data.copy() # request.data 자체 불변성 --> copy해서 편집
         data['booth'] = pk
+        data['is_soldout']=True
 
         if 'img' in data:
             if data['img'] == "":

@@ -77,7 +77,7 @@ class Menu(TimeStamp):
     booth = models.ForeignKey(Booth, on_delete=models.CASCADE, related_name='menus')
     menu = models.TextField()
     price = models.PositiveIntegerField()
-    is_soldout = models.BooleanField(default=False)
+    is_soldout = models.BooleanField(default=True)
     like = models.ManyToManyField(User, related_name='menus', blank=True)
     img = models.TextField(null=True, blank=True)
     vegan=models.CharField(null=True, max_length=5)
