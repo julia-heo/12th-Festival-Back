@@ -113,6 +113,7 @@ MIDDLEWARE = [
 
 # cors 
 CORS_ALLOW_CREDENTIALS = True
+'''
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
@@ -126,6 +127,8 @@ CORS_ALLOWED_ORIGINS = [
     'https://12th-ewha-festival-front.vercel.app',
     'http://13.209.81.181'
 ]
+'''
+CORS_ALLOWED_ORIGINS = ['*']
 CORS_ALLOW_METHODS = ( 
     'DELETE',
     'GET',
