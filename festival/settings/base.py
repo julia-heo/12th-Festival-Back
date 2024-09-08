@@ -123,8 +123,11 @@ CORS_ALLOWED_ORIGINS = [
     'https://liber-ewha.com',
     'https://www.liber-ewha.com',
     'https://api.liber-ewha.com',
-    'https://12th-ewha-festival-front.vercel.app/',
+    'https://12th-ewha-festival-front.vercel.app',
     'http://13.209.81.181',
+    'https://dpdnjs.shop',
+    'https://api.dpdnjs.shop',
+    'https://www.dpdnjs.shop'
 ]
 
 CORS_ALLOW_METHODS = ( 
