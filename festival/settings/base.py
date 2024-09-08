@@ -125,6 +125,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://api.liber-ewha.com',
     'https://12th-ewha-festival-front.vercel.app',
     'http://13.209.81.181',
+    'http://dpdnjs.shop',
     'https://dpdnjs.shop',
     'https://api.dpdnjs.shop',
     'https://www.dpdnjs.shop'
@@ -202,7 +203,7 @@ USE_TZ = False
 
 USE_L10N = False
 
-CSRF_TRUSTED_ORIGINS = ['https://*.liber-ewha.com','https://www.liber-ewha.com', 'http://127.0.0.1:8000','https://12th-ewha-festival-front.vercel.app','https://dpdnjs.shop','https://api.dpdnjs.shop','https://www.dpdnjs.shop']
+CSRF_TRUSTED_ORIGINS = ['https://*.liber-ewha.com','https://www.liber-ewha.com', 'http://127.0.0.1:8000','https://12th-ewha-festival-front.vercel.app','https://dpdnjs.shop','https://api.dpdnjs.shop','https://www.dpdnjs.shop','http://dpdnjs.shop']
 
 
 
